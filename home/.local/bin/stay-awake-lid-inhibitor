@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Hold a logind lid-switch inhibitor for as long as Omarchy's Stay Awake is on.
+# Closing the lid then still locks and blanks the screen (Hyprland's lid
+# binding) but doesn't suspend. Only the lid is inhibited: suspending on
+# purpose, and the low-battery hook, still work.
+
+state=$HOME/.local/state/omarchy/indicators/stay-awake
+[[ -f $state ]] || exit 0
+
+exec systemd-inhibit --what=handle-lid-switch --mode=block \
+  --who="Stay Awake" --why="Keep agents running with the lid closed" \
+  bash -c 'while [[ -f $1 ]]; do inotifywait -qq -t 60 -e delete -e moved_from "${1%/*}"; done' _ "$state"

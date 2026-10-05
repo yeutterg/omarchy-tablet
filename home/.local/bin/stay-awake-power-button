@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Power button. With Omarchy's Stay Awake on, lock and turn the screen off
+# (press again to wake) so the machine keeps running agents. With it off, open
+# Omarchy's system menu as usual.
+
+if ! omarchy-toggle-idle status | grep -q '"enabled":true'; then
+  exec omarchy-menu toggle system
+fi
+
+if hyprctl monitors -j | jq -e '[.[] | select(.disabled == false)] | all(.dpmsStatus)' >/dev/null 2>&1; then
+  omarchy-system-lock >/dev/null 2>&1 || true
+  omarchy-brightness-keyboard off
+  omarchy-brightness-display off
+else
+  omarchy-system-wake
+fi

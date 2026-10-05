@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch for Omarchy Stay Awake to block lid-close suspend
+
+[Path]
+PathExists=%h/.local/state/omarchy/indicators/stay-awake
+Unit=stay-awake-lid.service
+
+[Install]
+WantedBy=default.target

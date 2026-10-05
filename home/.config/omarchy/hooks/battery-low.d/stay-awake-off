@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Safety valve: on low battery, turn Stay Awake off so a closed lid can't drain
+# the battery flat. If the lid is already closed with no external display,
+# suspend now (closing the lid won't happen again to trigger it).
+
+if omarchy-toggle-idle status | grep -q '"enabled":true'; then
+  omarchy-toggle-idle allow-idle
+  omarchy-notification-send -u critical "Stay Awake turned off" "Battery is at ${1:-low}%"
+
+  if omarchy-hw-laptop-closed && ! omarchy-hw-external-monitors && ! omarchy-power-present; then
+    systemctl suspend
+  fi
+fi
