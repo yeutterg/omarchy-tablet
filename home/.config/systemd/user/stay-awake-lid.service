@@ -1,6 +1,0 @@
-[Unit]
-Description=Block lid-close suspend while Omarchy Stay Awake is on
-
-[Service]
-Type=simple
-ExecStart=%h/.local/bin/stay-awake-lid-inhibitor

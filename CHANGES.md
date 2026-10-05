@@ -36,13 +36,10 @@ detachables in general. Git history has the exact diffs.
 Extends Omarchy's Stay Awake toggle (coffee cup, `omarchy toggle idle`) so
 long-running jobs keep going with the lid closed or after pressing the power
 button.
-- **Package:** `inotify-tools`.
 - **Files:**
-  - `home/.local/bin/stay-awake-lid-inhibitor` +
-    `home/.config/systemd/user/stay-awake-lid.{path,service}` — while Stay
-    Awake is on, hold a logind `handle-lid-switch` inhibitor. Closing the lid
-    still locks and blanks the screen (Omarchy's lid binding) but doesn't
-    suspend. Only the lid is inhibited; suspending on purpose still works.
+  - `home/.local/bin/stay-awake-cover` +
+    `home/.config/systemd/user/stay-awake-cover.service` — see "Cover closed:
+    keep playing audio" below; it now holds the lid inhibitor for Stay Awake.
   - `home/.local/bin/stay-awake-power-button` +
     `home/.config/hypr/extras/50-tablet.lua` — the power button (Omarchy
     default: open the system menu) now locks and turns the screen off while
@@ -67,3 +64,23 @@ button.
   battery overwrites it, so this is only a default.
 - **Watch:** If Omarchy moves the state file or changes
   `omarchy-powerprofiles-set`, update the path.
+
+### Cover closed: keep playing audio — 2026-10-05
+- **Packages:** `jq`, `libpulse` (for `pactl`); both ship with Omarchy.
+- **Files:** `home/.local/bin/stay-awake-cover` +
+  `home/.config/systemd/user/stay-awake-cover.service` (replace the earlier
+  `stay-awake-lid-inhibitor` + `stay-awake-lid.{path,service}`).
+- **Change:** An always-on user service checks every 5 s and holds a logind
+  `handle-lid-switch` inhibitor while Omarchy's Stay Awake is on **or** any audio
+  output stream is playing (a PipeWire/Pulse sink input that isn't corked), plus
+  60 s after audio stops so gaps between tracks don't count. Omarchy default:
+  closing the lid locks and suspends, which stops playback.
+- **Why:** Close the cover and keep listening, like a phone: the lock and screen
+  off still happen, only the suspend is skipped.
+- **Behaviour once released:** logind is expected to act on the still-closed
+  lid and suspend. Not yet tested.
+- **Cost:** A closed tablet playing audio keeps running on battery. The
+  low-battery hook still suspends.
+- **Watch:** Machines that installed the old version keep a dangling
+  `default.target.wants/stay-awake-lid.path` link; `systemctl --user disable
+  stay-awake-lid.path` before pulling, or delete the link.

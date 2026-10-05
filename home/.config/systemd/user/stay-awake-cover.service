@@ -1,0 +1,10 @@
+[Unit]
+Description=Block cover-close suspend while Stay Awake is on or audio is playing
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/stay-awake-cover
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

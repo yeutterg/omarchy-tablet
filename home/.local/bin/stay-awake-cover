@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Keep the tablet from sleeping when the cover (lid) closes, for as long as
+# there's a reason to stay up:
+#   - Omarchy's Stay Awake is on, or
+#   - audio is playing (any output stream that isn't paused).
+# Closing the cover still locks and turns the screen off (Omarchy's lid
+# binding); it just doesn't suspend. Only the lid is inhibited: suspending on
+# purpose, and the low-battery hook, still work. Once no reason is left, the
+# inhibitor is released and logind applies the closed lid as usual.
+
+stay_awake=$HOME/.local/state/omarchy/indicators/stay-awake
+poll=5           # seconds between checks
+audio_grace=60   # seconds to keep holding after audio stops (gaps between tracks)
+
+inhibitor=""
+last_audio=0
+
+audio_playing() {
+  pactl -f json list sink-inputs 2>/dev/null | jq -e 'any(.[]; .corked == false)' >/dev/null
+}
+
+want_awake() {
+  [[ -f $stay_awake ]] && return 0
+  if audio_playing; then
+    last_audio=$SECONDS
+    return 0
+  fi
+  ((last_audio > 0 && SECONDS - last_audio < audio_grace))
+}
+
+release() {
+  [[ -n $inhibitor ]] && kill "$inhibitor" 2>/dev/null
+  inhibitor=""
+}
+trap 'release; exit 0' TERM INT
+
+while true; do
+  if want_awake; then
+    if [[ -z $inhibitor ]] || ! kill -0 "$inhibitor" 2>/dev/null; then
+      systemd-inhibit --what=handle-lid-switch --mode=block --who="Stay awake" \
+        --why="Stay Awake is on or audio is playing" sleep infinity &
+      inhibitor=$!
+    fi
+  else
+    release
+  fi
+  sleep "$poll" &
+  wait $!
+done
