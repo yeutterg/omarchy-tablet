@@ -13,6 +13,7 @@ Dell Latitude 7350 Detachable, see
 |---|---|
 | [On-screen keyboard](#on-screen-keyboard) | squeekboard pops up for text fields, only while the keyboard is detached |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, with a low-battery safety valve |
+| [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
 ### On-screen keyboard
 - squeekboard replaces fcitx5 as the Wayland input method (fcitx5 is disabled,
@@ -30,6 +31,12 @@ Dell Latitude 7350 Detachable, see
   (press again to wake); otherwise it opens the system menu as usual.
 - **Low battery:** Stay Awake turns off, and a closed machine on battery with no
   external display suspends.
+
+### Power saver on battery
+Omarchy remembers one power profile for AC and one for battery, and switches
+when you plug in or unplug. With nothing saved, battery uses `balanced`;
+`install.sh` saves `power-saver` instead. Picking another profile from the menu
+while on battery still replaces it.
 
 Full details, reasons and things to watch on Omarchy updates are in
 [CHANGES.md](CHANGES.md).

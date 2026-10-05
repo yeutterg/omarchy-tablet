@@ -55,3 +55,15 @@ button.
 - **Relies on:** Omarchy's Stay Awake state file
   (`~/.local/state/omarchy/indicators/stay-awake`) and
   `omarchy-toggle-idle status` output. Check these if Omarchy changes the toggle.
+
+### Power saver by default on battery — 2026-10-05
+- **File:** `install.sh` (`default_battery_power_saver`)
+- **Change:** If `~/.local/state/omarchy/powerprofiles/battery` doesn't exist,
+  write `power-saver` to it and reapply the profile (Omarchy default with no
+  saved choice: `balanced` on battery, `performance` on AC).
+- **Why:** Longer battery life on a tablet; plugged in stays as before.
+- **How it applies:** Omarchy's shell runs `omarchy-powerprofiles-set battery`
+  on unplug, which uses the saved file. A profile chosen from the menu while on
+  battery overwrites it, so this is only a default.
+- **Watch:** If Omarchy moves the state file or changes
+  `omarchy-powerprofiles-set`, update the path.

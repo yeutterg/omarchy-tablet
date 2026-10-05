@@ -92,10 +92,24 @@ $loader"
   echo "Added the hypr/extras loader to $conf"
 }
 
+# Power saver on battery by default. Omarchy saves one profile per power
+# source and applies it when the power source changes, falling back to
+# balanced on battery. Seed power-saver only when nothing is saved yet, so a
+# profile picked later from the menu still wins.
+default_battery_power_saver() {
+  local state=${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/powerprofiles/battery
+  [[ -e $state ]] && return 0
+  mkdir -p "${state%/*}"
+  echo power-saver >"$state"
+  echo "Set power-saver as the battery power profile"
+  omarchy-powerprofiles-set autodetect 2>/dev/null || true
+}
+
 link_tree
 prune_stale_links
 enable_units
 check_packages
 ensure_hypr_extras_loader
+default_battery_power_saver
 
 echo "Done. Run 'hyprctl reload' to apply Hyprland changes; some changes (environment.d, WirePlumber, input method) apply on next login."
