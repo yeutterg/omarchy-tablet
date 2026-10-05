@@ -105,3 +105,40 @@ button.
 - **Relies on:** `herdr` CLI JSON (`sessions[].running/socket_path`,
   `result.agents[].agent_status`) and `HERDR_SOCKET_PATH` picking the session.
   Check these if herdr changes its API.
+
+### Lock screen number pad and PIN — 2026-10-05
+- **Files:**
+  - `home/.config/omarchy/plugins/tablet.lock/` — copy of Omarchy's
+    `omarchy.lock` plugin (`manifest.json` has `clonedFrom: "omarchy.lock"`, so
+    it keeps the lock screen's trusted `authentication` capability and Omarchy
+    routes lock calls to it). Changes are marked `omarchy-tablet`:
+    `Service.qml` adds the PIN check and tablet-mode watcher; `LockView.qml`
+    adds the 3×4 number pad and PIN dots, and says "Enter PIN or Password"
+    while the keyboard is attached.
+  - `home/.local/bin/lock-pin` — `set` / `remove` / `keypad always|detached` /
+    `status`, plus `check` and `reset` for the plugin.
+  - `home/.config/hypr/extras/50-tablet.lua` — the tablet-mode switch also
+    writes `1`/`0` to `$XDG_RUNTIME_DIR/omarchy-tablet/tablet-mode` (`0` at
+    login).
+  - `install.sh` — copies plugins instead of linking (Omarchy's
+    `omarchy-plugin-validate` refuses symlinks inside a plugin) and enables
+    them, which disables the built-in `omarchy.lock`.
+- **Behaviour:** With a PIN set, the lock screen shows a number pad: always by
+  default, or only while the keyboard is detached after `lock-pin keypad
+  detached` (saved next to the PIN, outside the repo). It submits as soon as the PIN's length is reached (or on ✓).
+  Typing on a keyboard still goes to the password and PAM, as before.
+- **PIN storage:** `lock-pin set` stores a salted SHA-512 crypt hash
+  (`openssl passwd -6`) and the PIN length in
+  `~/.local/state/omarchy-tablet/lock-pin/` (mode 600). Nothing about the PIN
+  is in this repo. The PIN goes to `lock-pin check` on stdin, not argv.
+- **Limits:** 5 wrong PINs disable the PIN until a password (or fingerprint)
+  unlock. The PIN is checked outside PAM, so it doesn't count toward PAM's
+  faillock, and it can't be used for sudo, login or disk unlock. Anyone with
+  access to your user account could brute-force a 4-digit hash offline, but
+  they would already be past the lock screen.
+- **Why:** squeekboard can't draw over a session lock, so with the keyboard
+  detached there was no way to unlock without fingerprint.
+- **Watch:** On Omarchy updates, diff `/usr/share/omarchy/shell/plugins/lock/`
+  against this copy and port changes; the built-in stays disabled while
+  `tablet.lock` is enabled. If the plugin fails to load, the screen can't
+  lock: run `omarchy plugin enable omarchy.lock`.

@@ -13,6 +13,7 @@ Dell Latitude 7350 Detachable, see
 |---|---|
 | [On-screen keyboard](#on-screen-keyboard) | squeekboard pops up for text fields, only while the keyboard is detached |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
+| [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
 ### On-screen keyboard
@@ -36,6 +37,18 @@ Dell Latitude 7350 Detachable, see
 - **Low battery:** Stay Awake turns off, and a closed machine on battery with no
   external display suspends.
 
+### Lock screen PIN pad
+- The on-screen keyboard can't appear over the lock screen, so this repo ships
+  a copy of Omarchy's lock screen (`tablet.lock`) with a number pad, shown
+  whenever a PIN is set. `lock-pin keypad detached` shows it only while the
+  keyboard is detached; `lock-pin keypad always` (the default) switches back.
+- The PIN works only from the number pad; your password still works from a
+  keyboard. After 5 wrong PINs, the PIN stops working until you unlock once with
+  your password.
+- **Set it up** (stored as a salted hash in `~/.local/state`, never in this
+  repo): `lock-pin set`. Remove with `lock-pin remove`.
+- Trade-off: the copy doesn't get Omarchy's lock screen updates by itself.
+
 ### Power saver on battery
 Omarchy remembers one power profile for AC and one for battery, and switches
 when you plug in or unplug. With nothing saved, battery uses `balanced`;
@@ -55,11 +68,13 @@ sudo pacman -S --needed squeekboard jq libpulse
 git clone https://github.com/yeutterg/omarchy-tablet ~/dotfiles/omarchy-tablet
 ~/dotfiles/omarchy-tablet/install.sh
 hyprctl reload   # then log out and back in for the input method
+lock-pin set     # optional: PIN for the lock screen number pad
 ```
 
 `install.sh` symlinks `home/` into `$HOME` (a real file in the way is moved to
-`<file>.pre-dotfiles`), enables the systemd user units, and adds one line to
+`<file>.pre-dotfiles`), copies the Omarchy shell plugin (Omarchy refuses
+symlinked plugins) and switches it on in place of the built-in, enables the systemd user units, and adds one line to
 `~/.config/hypr/hyprland.lua` that loads `~/.config/hypr/extras/*.lua` in name
 order. This repo's Hyprland settings are `extras/50-tablet.lua`; device repos
 use `60-*.lua`. To uninstall, delete the symlinks into this repo and restore any
-`*.pre-dotfiles` files.
+`*.pre-dotfiles` files, and run `omarchy plugin enable omarchy.lock`.
