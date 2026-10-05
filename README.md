@@ -6,7 +6,7 @@ a Stay Awake mode that keeps the machine running with the cover closed.
 
 Nothing here is tied to one model. Settings for specific hardware live in their
 own repos and load on top of this one, for example
-`omarchy-latitude-7350-detachable`.
+`omarchy-dell-latitude-7350-detachable`.
 
 ## What's included
 
