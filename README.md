@@ -1,4 +1,4 @@
-# omarchy-tablet
+# Omarchy Dotfiles for Tablets
 
 [Omarchy](https://omarchy.org) customizations for tablets and detachables
 (Surface-style devices). Nothing here is tied to one model.
