@@ -12,7 +12,7 @@ Dell Latitude 7350 Detachable, see
 | Customization | Summary |
 |---|---|
 | [On-screen keyboard](#on-screen-keyboard) | squeekboard pops up for text fields, only while the keyboard is detached |
-| [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, audio keeps playing with the cover closed, and a low-battery safety valve |
+| [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
 ### On-screen keyboard
@@ -28,6 +28,9 @@ Dell Latitude 7350 Detachable, see
 - **Lid:** while Stay Awake is on, or while audio is playing (and for a minute
   after it stops), closing the lid locks and blanks the screen but doesn't
   suspend, so music keeps playing.
+- **herdr agents:** Stay Awake turns on while any herdr agent is working and
+  off again once they've all stopped, unless you turned it on yourself.
+  Turning it off by hand mid-run sticks until the agents stop.
 - **Power button:** while Stay Awake is on, it locks and turns the screen off
   (press again to wake); otherwise it opens the system menu as usual.
 - **Low battery:** Stay Awake turns off, and a closed machine on battery with no

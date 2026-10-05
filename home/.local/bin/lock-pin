@@ -1,0 +1,86 @@
+#!/bin/bash
+
+# PIN for the lock screen's on-screen number pad (tablet.lock plugin).
+#   lock-pin set      choose a 4-6 digit PIN (asked twice, never echoed)
+#   lock-pin remove   turn the PIN off; the lock screen goes back to password only
+#   lock-pin keypad always|detached
+#                     show the number pad always (default) or only while the
+#                     keyboard is detached
+#   lock-pin status   JSON: is a PIN set, its length, locked out, keypad mode
+#   lock-pin check    used by the lock screen: reads one PIN line on stdin;
+#                     exit 0 match, 1 wrong, 2 locked out or no PIN
+#   lock-pin reset    used by the lock screen after a password unlock
+# Only a salted SHA-512 crypt hash is stored, in a user-only file under
+# ~/.local/state, outside any dotfiles repo. After 5 wrong PINs the PIN stops
+# working until the next password unlock.
+
+set -euo pipefail
+
+dir=${XDG_STATE_HOME:-$HOME/.local/state}/omarchy-tablet/lock-pin
+hash_file=$dir/hash
+fails_file=$dir/failures
+max_failures=5
+
+umask 077
+
+keypad_always() { [[ $(cat "$dir/keypad" 2>/dev/null) != detached ]]; }
+
+failures() { [[ -f $fails_file ]] && cat "$fails_file" || echo 0; }
+
+hash_pin() { openssl passwd -6 -stdin ${1:+-salt "$1"} <<<"$2"; }
+
+case "${1:-}" in
+  set)
+    read -rsp "New PIN (4-6 digits): " pin; echo
+    [[ $pin =~ ^[0-9]{4,6}$ ]] || { echo "A PIN is 4 to 6 digits." >&2; exit 1; }
+    read -rsp "Repeat PIN: " again; echo
+    [[ $pin == "$again" ]] || { echo "PINs don't match." >&2; exit 1; }
+    mkdir -p "$dir"
+    hash_pin "" "$pin" >"$hash_file.tmp"
+    echo "${#pin}" >"$dir/length"
+    mv "$hash_file.tmp" "$hash_file"
+    rm -f "$fails_file"
+    echo "PIN set. It works only from the lock screen's number pad."
+    ;;
+  remove)
+    rm -f "$hash_file" "$dir/length" "$fails_file"  # keeps the keypad setting
+    echo "PIN removed."
+    ;;
+  keypad)
+    [[ ${2:-} == always || ${2:-} == detached ]] || { echo "Usage: lock-pin keypad always|detached" >&2; exit 1; }
+    mkdir -p "$dir"
+    echo "$2" >"$dir/keypad"
+    echo "Number pad: $2."
+    ;;
+  status)
+    always=$(keypad_always && echo true || echo false)
+    if [[ -f $hash_file ]]; then
+      printf '{"enabled":true,"length":%s,"lockedOut":%s,"keypadAlways":%s}\n' "$(cat "$dir/length")" \
+        "$( (($(failures) >= max_failures)) && echo true || echo false)" "$always"
+    else
+      printf '{"enabled":false,"length":0,"lockedOut":false,"keypadAlways":%s}\n' "$always"
+    fi
+    ;;
+  check)
+    IFS= read -r pin || true
+    [[ -f $hash_file ]] || exit 2
+    (($(failures) < max_failures)) || exit 2
+    stored=$(<"$hash_file")
+    salt=${stored#\$6\$}
+    salt=${salt%%\$*}
+    if [[ $pin =~ ^[0-9]{4,6}$ && $(hash_pin "$salt" "$pin") == "$stored" ]]; then
+      rm -f "$fails_file"
+      exit 0
+    fi
+    echo $(($(failures) + 1)) >"$fails_file"
+    (($(failures) < max_failures)) || exit 2
+    exit 1
+    ;;
+  reset)
+    rm -f "$fails_file"
+    ;;
+  *)
+    echo "Usage: lock-pin set|remove|keypad always|detached|status" >&2
+    exit 1
+    ;;
+esac

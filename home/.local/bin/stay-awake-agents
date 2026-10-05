@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# Turn Omarchy's Stay Awake on while any herdr agent is working, and back off
+# once they've all stopped, unless it was turned on by hand.
+#   - Only Stay Awake this script turned on is turned off again (tracked with a
+#     marker file). If it was already on, it's left alone.
+#   - Turning Stay Awake off while agents work (by hand, or the low-battery
+#     hook) sticks until every agent has stopped; the next run turns it on again.
+#   - On battery at or below Omarchy's low-battery level, it isn't turned on.
+# Every running herdr session is checked. Stay Awake also covers the lid and
+# power button (stay-awake-cover, stay-awake-power-button).
+
+stay_awake=$HOME/.local/state/omarchy/indicators/stay-awake
+marker=${XDG_STATE_HOME:-$HOME/.local/state}/stay-awake-agents/auto
+poll=10         # seconds between checks
+grace=30        # seconds agents must be stopped before turning off
+low_battery=10  # Omarchy's low-battery warning level
+
+suppressed=0
+last_working=-1000
+
+agents_working() {
+  local socket
+  herdr session list --json 2>/dev/null | jq -r '.sessions[] | select(.running) | .socket_path' |
+    while read -r socket; do
+      HERDR_SOCKET_PATH=$socket herdr agent list 2>/dev/null |
+        jq -e 'any(.result.agents[]?; .agent_status == "working")' >/dev/null && echo yes && break
+    done | grep -q yes
+}
+
+battery_low() {
+  local bat
+  omarchy-power-present && return 1
+  for bat in /sys/class/power_supply/BAT*/capacity; do
+    [[ -f $bat ]] && (($(<"$bat") <= low_battery)) && return 0
+  done
+  return 1
+}
+
+mkdir -p "${marker%/*}"
+
+while true; do
+  # Turned off while we held it: respect that until agents stop.
+  if [[ -f $marker && ! -f $stay_awake ]]; then
+    rm -f "$marker"
+    suppressed=1
+  fi
+
+  if agents_working; then
+    last_working=$SECONDS
+    if ((!suppressed)) && [[ ! -f $stay_awake ]] && ! battery_low; then
+      omarchy-toggle-idle stay-awake >/dev/null
+      touch "$marker"
+    fi
+  elif ((SECONDS - last_working >= grace)); then
+    suppressed=0
+    if [[ -f $marker ]]; then
+      rm -f "$marker"
+      omarchy-toggle-idle allow-idle >/dev/null
+    fi
+  fi
+
+  sleep "$poll" &
+  wait $!
+done

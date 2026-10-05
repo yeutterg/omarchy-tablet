@@ -32,7 +32,29 @@ link_tree() {
 
     ln -sfn "$repo/home/$rel" "$target"
     echo "Linked $target"
-  done < <(cd "$repo/home" && find . -type f -print0)
+  done < <(cd "$repo/home" && find . -type f -not -path './.config/omarchy/plugins/*' -print0)
+}
+
+# Omarchy shell plugins are copied, not linked: Omarchy refuses symlinks inside
+# a plugin folder. Re-run this script after changing one. A plugin with
+# `clonedFrom` replaces that built-in once enabled.
+install_plugins() {
+  local src id target
+  for src in "$repo"/home/.config/omarchy/plugins/*/; do
+    [[ -f $src/manifest.json ]] || continue
+    id=$(basename "$src")
+    target=$HOME/.config/omarchy/plugins/$id
+    rm -rf "$target"
+    mkdir -p "$target"
+    cp -a "$src." "$target/"
+    echo "Copied plugin $id"
+    omarchy-plugin-validate "$target" >/dev/null || continue
+    # Needs the shell running; otherwise run omarchy-plugin-enable after login.
+    if omarchy-shell shell rescanPlugins >/dev/null 2>&1; then
+      sleep 1
+      omarchy-plugin-enable "$id" >/dev/null && echo "Enabled plugin $id"
+    fi
+  done
 }
 
 # Remove links into this repo whose file was moved or deleted here.
@@ -106,6 +128,7 @@ default_battery_power_saver() {
 }
 
 link_tree
+install_plugins
 prune_stale_links
 enable_units
 check_packages

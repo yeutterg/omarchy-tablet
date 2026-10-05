@@ -1,0 +1,10 @@
+[Unit]
+Description=Turn Stay Awake on while herdr agents are working
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/stay-awake-agents
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

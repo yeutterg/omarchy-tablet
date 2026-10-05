@@ -84,3 +84,24 @@ button.
 - **Watch:** Machines that installed the old version keep a dangling
   `default.target.wants/stay-awake-lid.path` link; `systemctl --user disable
   stay-awake-lid.path` before pulling, or delete the link.
+
+### Stay Awake turns on while herdr agents work — 2026-10-05
+- **Package:** `herdr` (not in packages.txt; without it the service idles).
+- **Files:** `home/.local/bin/stay-awake-agents` +
+  `home/.config/systemd/user/stay-awake-agents.service`.
+- **Change:** A user service checks every 10 s whether any agent in any running
+  herdr session has status `working` (`herdr session list --json`, then
+  `herdr agent list` per session socket). If so and Stay Awake is off, it turns
+  it on with `omarchy-toggle-idle stay-awake` and leaves a marker in
+  `~/.local/state/stay-awake-agents/auto`. Once no agent has been working for
+  30 s, it turns Stay Awake off again, but only if the marker is there.
+  `blocked` (waiting on you), `idle` and `done` don't count as working.
+- **Manual wins:** Stay Awake that was already on is never touched. Turning it
+  off while agents work (by hand or via the low-battery hook) stays off until
+  all agents stop. On battery at or below 10% (Omarchy's warning level) it
+  isn't turned on.
+- **Why:** Leave agents running with the cover closed or the screen off
+  without remembering to toggle Stay Awake, and without leaving it on after.
+- **Relies on:** `herdr` CLI JSON (`sessions[].running/socket_path`,
+  `result.agents[].agent_status`) and `HERDR_SOCKET_PATH` picking the session.
+  Check these if herdr changes its API.

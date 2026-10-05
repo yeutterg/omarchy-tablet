@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "tablet.lock",
+  "name": "Tablet Lock Screen",
+  "version": "1.0.0",
+  "author": "omarchy-tablet",
+  "description": "Omarchy's lock screen plus an on-screen number pad and PIN while the keyboard is detached.",
+  "omarchy": {
+    "capabilities": [
+      "authentication"
+    ],
+    "clonedFrom": "omarchy.lock"
+  },
+  "kinds": [
+    "service"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}
