@@ -4,6 +4,20 @@
 # (press again to wake) so the machine keeps running agents. With it off, open
 # Omarchy's system menu as usual.
 
+# Tablets often report one press from two devices (the ACPI "Power Button" and
+# the vendor HID buttons, e.g. "Intel HID events"). Without this, the second
+# report undoes the first: the screen wakes, then locks and blanks again.
+stamp=${XDG_RUNTIME_DIR:-/tmp}/omarchy-tablet/power-button
+now=$(date +%s%3N)
+last=$(cat "$stamp" 2>/dev/null || echo 0)
+mkdir -p "${stamp%/*}"
+echo "$now" >"$stamp"
+if (( now - last < 1500 )); then
+  logger -t stay-awake-power-button "ignored repeat press after $((now - last)) ms"
+  exit 0
+fi
+logger -t stay-awake-power-button "press"
+
 if ! omarchy-toggle-idle status | grep -q '"enabled":true'; then
   exec omarchy-menu toggle system
 fi

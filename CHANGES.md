@@ -45,6 +45,10 @@ button.
     default: open the system menu) now locks and turns the screen off while
     Stay Awake is on; press again to wake. With Stay Awake off it opens the
     system menu as before.
+    **2026-10-05:** a second press within 1.5 s is ignored (logged to the
+    journal as `stay-awake-power-button`). Tablets can report one press from
+    two devices (ACPI "Power Button" and the vendor HID buttons); the second
+    report locked and blanked the screen about a second after waking it.
   - `home/.config/omarchy/hooks/battery-low.d/stay-awake-off` — on Omarchy's
     low-battery warning, turn Stay Awake off; if the lid is closed, on battery,
     with no external display, suspend right away.

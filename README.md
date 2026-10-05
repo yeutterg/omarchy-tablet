@@ -33,7 +33,8 @@ Dell Latitude 7350 Detachable, see
   off again once they've all stopped, unless you turned it on yourself.
   Turning it off by hand mid-run sticks until the agents stop.
 - **Power button:** while Stay Awake is on, it locks and turns the screen off
-  (press again to wake); otherwise it opens the system menu as usual.
+  (press again to wake); otherwise it opens the system menu as usual. A
+  double report of one press (common on tablets) is ignored.
 - **Low battery:** Stay Awake turns off, and a closed machine on battery with no
   external display suspends.
 
