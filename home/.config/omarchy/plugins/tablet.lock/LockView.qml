@@ -273,8 +273,8 @@ Item {
 
       Repeater {
         // The PIN submits on its last digit, so no confirm key; the blank
-        // keeps 0 centred like a phone keypad.
-        model: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "back"]
+        // keeps 0 centred under 8.
+        model: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back", "0", ""]
 
         delegate: Rectangle {
           required property string modelData
@@ -283,9 +283,9 @@ Item {
           radius: width / 2
           color: keyArea.pressed ? Color.lock.selection : Color.lock.background
           border.width: 2
-          visible: modelData !== ""
           border.color: Color.lock.placeholder
-          opacity: root.authenticatingPassword ? 0.5 : 1
+          // The blank keeps its grid cell (an invisible item would collapse it).
+          opacity: modelData === "" ? 0 : (root.authenticatingPassword ? 0.5 : 1)
 
           Text {
             anchors.centerIn: parent
@@ -298,6 +298,7 @@ Item {
           MouseArea {
             id: keyArea
             anchors.fill: parent
+            enabled: parent.modelData !== ""
             onClicked: root.pressKey(parent.modelData)
           }
         }
