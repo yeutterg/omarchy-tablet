@@ -59,10 +59,6 @@ Item {
 
     if (key === "back") {
       pinTextEdited(pinText.slice(0, -1))
-    } else if (key === "ok") {
-      var entered = pinText
-      pinTextEdited("")
-      if (entered.length > 0) submitPin(entered)
     } else if (pinText.length < 6) {
       var next = pinText + key
       // Submit as soon as the PIN is long enough, like a phone.
@@ -276,7 +272,9 @@ Item {
       spacing: root.keyGap
 
       Repeater {
-        model: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "back", "0", "ok"]
+        // The PIN submits on its last digit, so no confirm key; the blank
+        // keeps 0 centred like a phone keypad.
+        model: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "back"]
 
         delegate: Rectangle {
           required property string modelData
@@ -285,12 +283,13 @@ Item {
           radius: width / 2
           color: keyArea.pressed ? Color.lock.selection : Color.lock.background
           border.width: 2
-          border.color: modelData === "ok" ? Color.lock.borderActive : Color.lock.placeholder
+          visible: modelData !== ""
+          border.color: Color.lock.placeholder
           opacity: root.authenticatingPassword ? 0.5 : 1
 
           Text {
             anchors.centerIn: parent
-            text: modelData === "back" ? "\u232B" : (modelData === "ok" ? "\u2713" : modelData)
+            text: modelData === "back" ? "\u232B" : modelData
             color: Color.lock.text
             font.family: Style.font.family
             font.pixelSize: Math.round(root.keySize * 0.38)

@@ -129,7 +129,7 @@ button.
     them, which disables the built-in `omarchy.lock`.
 - **Behaviour:** With a PIN set, the lock screen shows a number pad: always by
   default, or only while the keyboard is detached after `lock-pin keypad
-  detached` (saved next to the PIN, outside the repo). It submits as soon as the PIN's length is reached (or on ✓).
+  detached` (saved next to the PIN, outside the repo). It submits as soon as the last digit is entered; there's no confirm key.
   Typing on a keyboard still goes to the password and PAM, as before.
 - **PIN storage:** `lock-pin set` stores a salted SHA-512 crypt hash
   (`openssl passwd -6`) and the PIN length in
