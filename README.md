@@ -11,24 +11,25 @@ Dell Latitude 7350 Detachable, see
 
 | Customization | Summary |
 |---|---|
-| [On-screen keyboard](#on-screen-keyboard) | squeekboard pops up for text fields, only while the keyboard is detached, styled like Omarchy, with a dictation key |
+| [On-screen keyboard](#on-screen-keyboard) | The on-screen keyboard plugin, set up as the input method: pops up on text fields while detached, docks or floats |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
 | [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
 | [Screen rotation](#screen-rotation) | Rotate the built-in screen by hand or automatically from the accelerometer; touch and pen follow |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
 ### On-screen keyboard
-- squeekboard replaces fcitx5 as the Wayland input method (fcitx5 is disabled,
-  its environment variables masked), so it appears when a text field is focused.
-- It's only enabled while the tablet-mode switch says the keyboard is detached.
-  The switch is found from the kernel, not by device name.
-- Chromium gets the IME flags it needs to request the keyboard.
-- Styled like Omarchy: square keys, the theme's colors and accent, the
-  monospace font. It follows theme and font changes.
-- A microphone key next to space: hold it to dictate with Omarchy's voxtype (it sends
-  F9, the push-to-talk key). Needs voxtype set up (`omarchy-voxtype-install`).
+- The keyboard is a separate Omarchy plugin,
+  [omarchy-on-screen-keyboard](https://github.com/yeutterg/omarchy-on-screen-keyboard):
+  drawn in Omarchy's style, docked or floating and draggable, with a dictation
+  key and a bar button to show or hide it. `install.sh` adds it and puts the
+  button in the bar.
+- It pops up on text fields while the tablet-mode switch says the keyboard is
+  detached.
+- This repo makes it the input method: fcitx5 is disabled and its environment
+  variables masked. Chromium gets the IME flags it needs to request the keyboard.
 - Trade-offs: no fcitx-based compose sequences; apps without text-input-v3
-  (most Electron apps) won't trigger the keyboard.
+  (most Electron apps) won't pop the keyboard up, though you can still type
+  into them from the bar button.
 
 ### Stay Awake with the cover closed
 - **Lid:** while Stay Awake is on, or while audio is playing (and for a minute
@@ -79,7 +80,7 @@ Requires Omarchy on a tablet, convertible or detachable (DMI chassis type
 30–32), plus the packages in [packages.txt](packages.txt).
 
 ```bash
-sudo pacman -S --needed squeekboard jq libpulse iio-sensor-proxy
+sudo pacman -S --needed python-pywayland jq libpulse iio-sensor-proxy
 git clone https://github.com/yeutterg/omarchy-tablet ~/dotfiles/omarchy-tablet
 ~/dotfiles/omarchy-tablet/install.sh
 hyprctl reload   # then log out and back in for the input method

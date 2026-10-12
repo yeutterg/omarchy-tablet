@@ -21,20 +21,15 @@ local function tablet_mode_switches()
   return names
 end
 
--- On-screen keyboard: squeekboard is the input method (fcitx5 is disabled by
--- this repo), so it pops up when a text field is focused. It only shows while
--- the screen-keyboard setting is on, which follows the tablet-mode switch: on
--- when the keyboard is detached, off when it is attached.
--- The same switch writes 1/0 to $XDG_RUNTIME_DIR/omarchy-tablet/tablet-mode,
--- which the lock screen (tablet.lock plugin) reads to show its number pad.
-local osk = "gsettings set org.gnome.desktop.a11y.applications screen-keyboard-enabled "
+-- Tablet mode: the tablet-mode switch writes 1/0 to
+-- $XDG_RUNTIME_DIR/omarchy-tablet/tablet-mode, which the lock screen
+-- (tablet.lock plugin) reads to show its number pad. The on-screen keyboard
+-- plugin adds its own binds for the same switch.
 local function tablet_mode(on)
   local state = '"$XDG_RUNTIME_DIR/omarchy-tablet"'
-  return "mkdir -p " .. state .. "; echo " .. (on and 1 or 0) .. " > " .. state .. "/tablet-mode; "
-    .. osk .. (on and "true" or "false")
+  return "mkdir -p " .. state .. "; echo " .. (on and 1 or 0) .. " > " .. state .. "/tablet-mode"
 end
 o.exec_on_start(tablet_mode(false))
-o.launch_on_start("squeekboard")
 for _, switch in ipairs(tablet_mode_switches()) do
   o.bind("switch:on:" .. switch, nil, tablet_mode(true), { locked = true })
   o.bind("switch:off:" .. switch, nil, tablet_mode(false), { locked = true })

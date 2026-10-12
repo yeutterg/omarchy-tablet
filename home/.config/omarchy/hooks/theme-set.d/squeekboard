@@ -1,3 +1,0 @@
-#!/bin/bash
-# Re-theme the on-screen keyboard (omarchy-tablet)
-"$HOME/.local/bin/squeekboard-restart"

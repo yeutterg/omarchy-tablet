@@ -3,15 +3,14 @@
 Every intentional deviation from what Omarchy ships, for tablets and
 detachables in general. Git history has the exact diffs.
 
-### On-screen keyboard (squeekboard) when detached — 2026-10-04
-- **Package:** `squeekboard`.
+### On-screen keyboard plugin as the input method — 2026-10-04, plugin since 2026-10-12
+- **Package:** `python-pywayland` (for the plugin's helper).
+- **Plugin:** [omarchy-on-screen-keyboard](https://github.com/yeutterg/omarchy-on-screen-keyboard)
+  (`io.github.yeutterg.onscreen-keyboard`), added by `install.sh` with
+  `omarchy plugin add --enable` and placed in the bar's right section. It finds
+  the tablet-mode switch itself and adds its own Hyprland binds at runtime.
 - **Files:**
-  - `home/.config/hypr/extras/50-tablet.lua` — starts squeekboard at login, sets
-    `org.gnome.desktop.a11y.applications screen-keyboard-enabled` to `false` at
-    login, and flips it `true`/`false` on the tablet-mode switch. The switch is
-    found by reading `/proc/bus/input/devices` for a device reporting
-    `SW_TABLET_MODE`, so no device name is hardcoded.
-  - `home/.config/systemd/user/omarchy-fcitx5.service.d/squeekboard-instead.conf`
+  - `home/.config/systemd/user/omarchy-fcitx5.service.d/onscreen-keyboard-instead.conf`
     — a never-true condition so Omarchy's fcitx5 doesn't start.
   - `home/.config/environment.d/10-omarchy-fcitx.conf` — masks Omarchy's file of
     the same name, so `QT_IM_MODULE`/`XMODIFIERS`/`SDL_IM_MODULE`/`INPUT_METHOD`
@@ -21,16 +20,15 @@ detachables in general. Git history has the exact diffs.
     tells the input method about focused text fields.
 - **Why:** Show a keyboard only when the keyboard is detached *and* a text field
   is focused. That needs the on-screen keyboard to be the Wayland input method,
-  and only one input method can run, so squeekboard replaces fcitx5.
+  and only one input method can run, so it replaces fcitx5.
+- **History:** Until 2026-10-12 the keyboard was squeekboard, with layouts, a
+  GTK stylesheet and theme hooks in this repo. squeekboard can't float, and
+  Hyprland ignores binds from its virtual keyboard, so keys like dictation
+  couldn't work; the plugin replaced it.
 - **Costs:** Omarchy uses fcitx5 to turn CapsLock compose sequences
   (`~/.XCompose`) into text; apps that rely on fcitx for that may lose them.
   Apps without text-input-v3 support (most Electron apps unless given the IME
-  flags) won't trigger the keyboard.
-- **Limits:** If you log in already detached, the keyboard stays off until the
-  next attach/detach. Devices without a kernel tablet-mode switch get
-  squeekboard but never turn it on.
-- **Watch:** `chromium-flags.conf` is a full copy of Omarchy's; if Omarchy
-  changes its default flags, update this copy.
+  flags) won't pop the keyboard up.
 
 ### Stay Awake also covers the lid and power button — 2026-10-04
 Extends Omarchy's Stay Awake toggle (coffee cup, `omarchy toggle idle`) so
@@ -147,43 +145,6 @@ button.
   `tablet.lock` is enabled. If the plugin fails to load, the screen can't
   lock: run `omarchy plugin enable omarchy.lock`.
 
-### Dictation key on the on-screen keyboard — 2026-10-12
-- **Files:** `home/.local/share/squeekboard/keyboards/us.yaml`, `us_wide.yaml`
-  and `terminal/us.yaml`, `terminal/us_wide.yaml` — squeekboard 1.43.1's US
-  layouts (squeekboard shows the terminal ones when a terminal is focused) with
-  a microphone key added between the preferences key and space. Space gives up
-  the key's width.
-- **Why:** Dictation from the tablet without the hardware keyboard. The key
-  sends F9, and Omarchy binds F9 to `voxtype record start` on press and
-  `voxtype record stop` on release, so holding the key records.
-- **Limits:** Only the US layout has the key. squeekboard layouts can't run
-  commands, so it depends on Omarchy's F9 binding and on voxtype being
-  installed. These are copies of upstream layouts, so a squeekboard update
-  that changes them won't show up here until they're re-copied.
-
-### On-screen keyboard styled like Omarchy — 2026-10-12
-- **Files:**
-  - `home/.config/omarchy/themed/squeekboard.css.tpl` — an Omarchy theme
-    template, so every theme change renders `squeekboard.css` into the current
-    theme with its colors. Square keys with thin borders, letters on the lighter
-    background, shift/backspace/123/settings darker and dimmer, Enter outlined
-    in the accent color, pressed keys and caps lock filled with the accent, the
-    microphone key red while held, an accent line along the top. Font is
-    `monospace`, which Omarchy points at its chosen font.
-  - `home/.config/gtk-3.0/gtk.css` — imports that file. squeekboard only loads
-    its built-in stylesheet, and GTK's user stylesheet is the only way to
-    override it. The selectors (`sq_view`, `sq_button`) only match squeekboard.
-  - `home/.local/bin/squeekboard-restart`, called by
-    `home/.config/omarchy/hooks/theme-set.d/squeekboard` and `font-set.d/squeekboard`
-    — squeekboard reads its stylesheet only at start, so it's restarted on a
-    theme or font change, staying shown or hidden as it was.
-- **Why:** squeekboard's default look is GNOME's (rounded grey keys, Cantarell),
-  which clashed with the rest of Omarchy.
-- **Costs:** This repo owns `~/.config/gtk-3.0/gtk.css`; any other GTK 3 user
-  CSS has to go in this file. Until a theme is set once after install, the
-  imported file doesn't exist and GTK 3 apps log a warning; `install.sh` renders
-  it for the current theme.
-
 ### Screen rotation, by hand or from the accelerometer — 2026-10-12
 - **Package:** `iio-sensor-proxy` (for auto-rotate; `monitor-sensor`).
 - **Files:**
@@ -202,4 +163,3 @@ button.
 - **Limits:** A Hyprland config reload reapplies the config's monitor rule
   (normal) until auto-rotate sees the next turn. The left-up/right-up mapping
   assumes a landscape-native panel; flip 1 and 3 if a device turns the wrong way.
-

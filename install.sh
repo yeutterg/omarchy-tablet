@@ -57,15 +57,18 @@ install_plugins() {
   done
 }
 
-# Omarchy renders themed templates only on a theme change, so render the
-# on-screen keyboard's stylesheet for the current theme now.
-render_keyboard_theme() {
-  local theme=$HOME/.local/state/omarchy/current/theme
-  [[ -f $theme/colors.toml ]] || return 0
-  omarchy-theme-color --file "$theme/colors.toml" --all |
-    while IFS=$'\t' read -r key value; do printf 's|{{ %s }}|%s|g\n' "$key" "$value"; done |
-    sed -f - "$repo/home/.config/omarchy/themed/squeekboard.css.tpl" >"$theme/squeekboard.css"
-  "$repo/home/.local/bin/squeekboard-restart"
+# The on-screen keyboard is its own Omarchy plugin. Add it from git once (it
+# then updates with `omarchy plugin update`), and put its button in the bar.
+keyboard_plugin_id=io.github.yeutterg.onscreen-keyboard
+keyboard_plugin_url=https://github.com/yeutterg/omarchy-on-screen-keyboard
+install_keyboard_plugin() {
+  if [[ ! -e $HOME/.config/omarchy/plugins/$keyboard_plugin_id ]]; then
+    omarchy-plugin-add "$keyboard_plugin_url" --enable --yes ||
+      { echo "Couldn't add the on-screen keyboard plugin; see $keyboard_plugin_url"; return 0; }
+  fi
+  omarchy-bar put "$keyboard_plugin_id" --section right >/dev/null 2>&1 || true
+  # squeekboard was this repo's keyboard before; stop one left running.
+  pkill -x squeekboard 2>/dev/null && echo "Stopped squeekboard" || true
 }
 
 # Remove links into this repo whose file was moved or deleted here.
@@ -140,7 +143,7 @@ default_battery_power_saver() {
 
 link_tree
 install_plugins
-render_keyboard_theme
+install_keyboard_plugin
 prune_stale_links
 enable_units
 check_packages

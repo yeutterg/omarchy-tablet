@@ -1,5 +1,5 @@
 # Packages this repo needs (installed by hand; install.sh lists missing ones).
-squeekboard
+python-pywayland
 jq
 libpulse
 iio-sensor-proxy
