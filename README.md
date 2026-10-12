@@ -58,7 +58,8 @@ Dell Latitude 7350 Detachable, see
 
 ### Screen rotation
 - `tablet-rotate normal|left|right|inverted` turns the built-in screen, and
-  touch and pen input with it. Picking a rotation by hand turns auto-rotate off.
+  touch and pen input with it; `tablet-rotate turn left|right` turns it a
+  quarter turn from where it is. Rotating by hand turns auto-rotate off.
 - `tablet-rotate auto on|off|toggle` follows the accelerometer
   (`tablet-autorotate.service`, on by default; needs `iio-sensor-proxy`).
 - `tablet-rotate status` prints JSON for bar widgets and panels to show.

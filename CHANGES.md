@@ -151,7 +151,8 @@ button.
   - `home/.local/bin/tablet-rotate` — rotates the first eDP/LVDS/DSI output with
     `hyprctl eval` (`hl.monitor` with its current mode, position and scale plus
     `transform`), and sets `input:touchdevice` and `input:tablet` `output` and
-    `transform` to match. `auto on|off|toggle` enables or disables the service;
+    `transform` to match. `turn left|right` steps a quarter turn from the
+    current rotation. `auto on|off|toggle` enables or disables the service;
     `status` prints `{"transform","auto","sensor"}`.
   - `home/.local/bin/tablet-autorotate` and
     `home/.config/systemd/user/tablet-autorotate.service` — reads

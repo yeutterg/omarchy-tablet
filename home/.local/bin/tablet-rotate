@@ -3,6 +3,9 @@
 # Rotate the built-in screen, with touch and pen following it.
 #   tablet-rotate normal|left|right|inverted   (or 0|90|180|270)
 #                         rotate now; turns auto-rotate off
+#   tablet-rotate turn left|right
+#                         a quarter turn from the current rotation; turns
+#                         auto-rotate off
 #   tablet-rotate auto on|off|toggle
 #                         auto-rotate from the accelerometer
 #                         (tablet-autorotate.service, needs iio-sensor-proxy)
@@ -55,6 +58,16 @@ case "${1:-}" in
     [[ ${2:-} =~ ^[0-3]$ ]] || { echo "Usage: tablet-rotate --apply 0-3" >&2; exit 1; }
     apply "$2"
     ;;
+  turn)
+    current=$(internal_monitor | jq -r '.transform // 0')
+    case "${2:-}" in
+      left) next=$(( (current + 1) % 4 )) ;;
+      right) next=$(( (current + 3) % 4 )) ;;
+      *) echo "Usage: tablet-rotate turn left|right" >&2; exit 1 ;;
+    esac
+    auto_active && systemctl --user disable --now "$service" >/dev/null 2>&1 || true
+    apply "$next"
+    ;;
   auto)
     case "${2:-}" in
       on) systemctl --user enable --now "$service" ;;
@@ -72,7 +85,7 @@ case "${1:-}" in
     ;;
   *)
     transform=$(transform_for "${1:-}") ||
-      { echo "Usage: tablet-rotate normal|left|right|inverted|auto on|off|toggle|status" >&2; exit 1; }
+      { echo "Usage: tablet-rotate normal|left|right|inverted|turn left|right|auto on|off|toggle|status" >&2; exit 1; }
     # Picking a rotation by hand means it should stay put.
     auto_active && systemctl --user disable --now "$service" >/dev/null 2>&1 || true
     apply "$transform"
