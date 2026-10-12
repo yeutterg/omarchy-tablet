@@ -35,34 +35,13 @@ link_tree() {
   done < <(cd "$repo/home" && find . -type f -not -path './.config/omarchy/plugins/*' -print0)
 }
 
-# Omarchy shell plugins are copied, not linked: Omarchy refuses symlinks inside
-# a plugin folder. Re-run this script after changing one. A plugin with
-# `clonedFrom` replaces that built-in once enabled.
-install_plugins() {
-  local src id target
-  for src in "$repo"/home/.config/omarchy/plugins/*/; do
-    [[ -f $src/manifest.json ]] || continue
-    id=$(basename "$src")
-    target=$HOME/.config/omarchy/plugins/$id
-    rm -rf "$target"
-    mkdir -p "$target"
-    cp -a "$src." "$target/"
-    echo "Copied plugin $id"
-    omarchy-plugin-validate "$target" >/dev/null || continue
-    # Needs the shell running; otherwise run omarchy-plugin-enable after login.
-    if omarchy-shell shell rescanPlugins >/dev/null 2>&1; then
-      sleep 1
-      omarchy-plugin-enable "$id" >/dev/null && echo "Enabled plugin $id"
-    fi
-  done
-}
-
 # Tablet features that are their own Omarchy plugins. Each is added from git
 # once (then updated with `omarchy plugin update`) and enabled; enabling puts
 # its button in the bar (the display plugin replaces the stock display panel).
 plugin_deps=(
   "io.github.yeutterg.onscreen-keyboard https://github.com/yeutterg/omarchy-on-screen-keyboard"
   "io.github.yeutterg.display-rotation https://github.com/yeutterg/omarchy-display-rotation"
+  "io.github.yeutterg.lock-pin https://github.com/yeutterg/omarchy-lock-pin"
 )
 install_plugin_deps() {
   local dep id url
@@ -73,11 +52,23 @@ install_plugin_deps() {
     fi
   done
   omarchy-bar put io.github.yeutterg.onscreen-keyboard --section right >/dev/null 2>&1 || true
-  # Earlier versions of this repo: squeekboard was the keyboard, and
-  # tablet-autorotate.service rotated the screen. Stop leftovers.
+  # Earlier versions of this repo: squeekboard was the keyboard,
+  # tablet-autorotate.service rotated the screen, and the lock screen was a
+  # copied tablet.lock plugin with its PIN under omarchy-tablet/. Clean up.
   pkill -x squeekboard 2>/dev/null && echo "Stopped squeekboard" || true
   if systemctl --user is-active --quiet tablet-autorotate.service 2>/dev/null; then
     systemctl --user stop tablet-autorotate.service && echo "Stopped tablet-autorotate.service"
+  fi
+  local old_lock=$HOME/.config/omarchy/plugins/tablet.lock
+  local old_pin=${XDG_STATE_HOME:-$HOME/.local/state}/omarchy-tablet/lock-pin
+  local new_pin=${XDG_STATE_HOME:-$HOME/.local/state}/omarchy-lock-pin
+  if [[ -d $old_pin && ! -e $new_pin/hash ]]; then
+    mkdir -p "$new_pin" && chmod 700 "$new_pin" && cp -a "$old_pin/." "$new_pin/" && echo "Moved the lock PIN to $new_pin"
+  fi
+  [[ -e $new_pin/hash || ! -e $old_pin/hash ]] && rm -rf "$old_pin"
+  if [[ -d $old_lock ]]; then
+    omarchy-plugin-disable tablet.lock >/dev/null 2>&1 || true
+    rm -rf "$old_lock" && echo "Removed the old tablet.lock plugin"
   fi
 }
 
@@ -152,7 +143,6 @@ default_battery_power_saver() {
 }
 
 link_tree
-install_plugins
 install_plugin_deps
 prune_stale_links
 enable_units

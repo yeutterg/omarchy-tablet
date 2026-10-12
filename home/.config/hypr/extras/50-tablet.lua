@@ -2,38 +2,8 @@
 -- Linked into ~/.config/hypr/extras/ by install.sh. Files there load in name
 -- order, so device repos (60-*.lua) can override anything set here.
 
--- Tablet-mode switches, found from the kernel rather than hardcoded by name:
--- any input device whose switch bitmap has SW_TABLET_MODE (bit 1) set. On a
--- Dell Latitude 7350 Detachable this is "Intel HID switches".
-local function tablet_mode_switches()
-  local names, name = {}, nil
-  local f = io.open("/proc/bus/input/devices", "r")
-  if not f then return names end
-  for line in f:lines() do
-    name = line:match('^N: Name="(.*)"$') or name
-    local bits = line:match("^B: SW=(.*)$")
-    local low = bits and tonumber(bits:match("(%x+)%s*$"), 16)
-    if low and math.floor(low / 2) % 2 == 1 then
-      names[#names + 1] = name
-    end
-  end
-  f:close()
-  return names
-end
-
--- Tablet mode: the tablet-mode switch writes 1/0 to
--- $XDG_RUNTIME_DIR/omarchy-tablet/tablet-mode, which the lock screen
--- (tablet.lock plugin) reads to show its number pad. The on-screen keyboard
--- plugin adds its own binds for the same switch.
-local function tablet_mode(on)
-  local state = '"$XDG_RUNTIME_DIR/omarchy-tablet"'
-  return "mkdir -p " .. state .. "; echo " .. (on and 1 or 0) .. " > " .. state .. "/tablet-mode"
-end
-o.exec_on_start(tablet_mode(false))
-for _, switch in ipairs(tablet_mode_switches()) do
-  o.bind("switch:on:" .. switch, nil, tablet_mode(true), { locked = true })
-  o.bind("switch:off:" .. switch, nil, tablet_mode(false), { locked = true })
-end
+-- The tablet-mode switch is handled by the plugins this repo installs
+-- (on-screen keyboard, lock screen PIN pad); each adds its own runtime binds.
 
 -- Power button: with Stay Awake on, lock and turn the screen off instead of
 -- opening the system menu (was: "Power menu"). Off: opens the menu as before.

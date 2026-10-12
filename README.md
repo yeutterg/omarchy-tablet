@@ -45,16 +45,16 @@ Dell Latitude 7350 Detachable, see
   external display suspends.
 
 ### Lock screen PIN pad
-- The on-screen keyboard can't appear over the lock screen, so this repo ships
-  a copy of Omarchy's lock screen (`tablet.lock`) with a number pad, shown
-  whenever a PIN is set. `lock-pin keypad detached` shows it only while the
-  keyboard is detached; `lock-pin keypad always` (the default) switches back.
+- The on-screen keyboard can't appear over the lock screen, so the lock screen
+  comes from the [omarchy-lock-pin](https://github.com/yeutterg/omarchy-lock-pin)
+  plugin: Omarchy's lock screen with a number pad and an optional 4–6 digit
+  PIN. `install.sh` adds it.
 - The PIN works only from the number pad; your password still works from a
   keyboard. After 5 wrong PINs, the PIN stops working until you unlock once with
   your password.
-- **Set it up** (stored as a salted hash in `~/.local/state`, never in this
-  repo): `lock-pin set`. Remove with `lock-pin remove`.
-- Trade-off: the copy doesn't get Omarchy's lock screen updates by itself.
+- **Set it up** (stored as a salted hash in `~/.local/state/omarchy-lock-pin`,
+  never in this repo):
+  `~/.config/omarchy/plugins/io.github.yeutterg.lock-pin/lock-pin set`.
 
 ### Screen rotation
 - The display panel in the bar comes from the
@@ -83,13 +83,15 @@ sudo pacman -S --needed python-pywayland jq libpulse iio-sensor-proxy
 git clone https://github.com/yeutterg/omarchy-tablet ~/dotfiles/omarchy-tablet
 ~/dotfiles/omarchy-tablet/install.sh
 hyprctl reload   # then log out and back in for the input method
-lock-pin set     # optional: PIN for the lock screen number pad
+~/.config/omarchy/plugins/io.github.yeutterg.lock-pin/lock-pin set   # optional PIN
 ```
 
 `install.sh` symlinks `home/` into `$HOME` (a real file in the way is moved to
-`<file>.pre-dotfiles`), copies the Omarchy shell plugin (Omarchy refuses
-symlinked plugins) and switches it on in place of the built-in, enables the systemd user units, and adds one line to
+`<file>.pre-dotfiles`), adds the plugins (on-screen keyboard, display with
+rotation, lock screen PIN pad) with `omarchy plugin add`, enables the systemd
+user units, and adds one line to
 `~/.config/hypr/hyprland.lua` that loads `~/.config/hypr/extras/*.lua` in name
 order. This repo's Hyprland settings are `extras/50-tablet.lua`; device repos
 use `60-*.lua`. To uninstall, delete the symlinks into this repo and restore any
-`*.pre-dotfiles` files, and run `omarchy plugin enable omarchy.lock`.
+`*.pre-dotfiles` files, and `omarchy plugin remove` each plugin (Omarchy's
+built-ins come back).
