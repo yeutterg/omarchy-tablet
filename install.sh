@@ -57,18 +57,28 @@ install_plugins() {
   done
 }
 
-# The on-screen keyboard is its own Omarchy plugin. Add it from git once (it
-# then updates with `omarchy plugin update`), and put its button in the bar.
-keyboard_plugin_id=io.github.yeutterg.onscreen-keyboard
-keyboard_plugin_url=https://github.com/yeutterg/omarchy-on-screen-keyboard
-install_keyboard_plugin() {
-  if [[ ! -e $HOME/.config/omarchy/plugins/$keyboard_plugin_id ]]; then
-    omarchy-plugin-add "$keyboard_plugin_url" --enable --yes ||
-      { echo "Couldn't add the on-screen keyboard plugin; see $keyboard_plugin_url"; return 0; }
-  fi
-  omarchy-bar put "$keyboard_plugin_id" --section right >/dev/null 2>&1 || true
-  # squeekboard was this repo's keyboard before; stop one left running.
+# Tablet features that are their own Omarchy plugins. Each is added from git
+# once (then updated with `omarchy plugin update`) and enabled; enabling puts
+# its button in the bar (the display plugin replaces the stock display panel).
+plugin_deps=(
+  "io.github.yeutterg.onscreen-keyboard https://github.com/yeutterg/omarchy-on-screen-keyboard"
+  "io.github.yeutterg.display-rotation https://github.com/yeutterg/omarchy-display-rotation"
+)
+install_plugin_deps() {
+  local dep id url
+  for dep in "${plugin_deps[@]}"; do
+    read -r id url <<<"$dep"
+    if [[ ! -e $HOME/.config/omarchy/plugins/$id ]]; then
+      omarchy-plugin-add "$url" --enable --yes || { echo "Couldn't add $id; see $url"; continue; }
+    fi
+  done
+  omarchy-bar put io.github.yeutterg.onscreen-keyboard --section right >/dev/null 2>&1 || true
+  # Earlier versions of this repo: squeekboard was the keyboard, and
+  # tablet-autorotate.service rotated the screen. Stop leftovers.
   pkill -x squeekboard 2>/dev/null && echo "Stopped squeekboard" || true
+  if systemctl --user is-active --quiet tablet-autorotate.service 2>/dev/null; then
+    systemctl --user stop tablet-autorotate.service && echo "Stopped tablet-autorotate.service"
+  fi
 }
 
 # Remove links into this repo whose file was moved or deleted here.
@@ -143,7 +153,7 @@ default_battery_power_saver() {
 
 link_tree
 install_plugins
-install_keyboard_plugin
+install_plugin_deps
 prune_stale_links
 enable_units
 check_packages

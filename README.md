@@ -14,7 +14,7 @@ Dell Latitude 7350 Detachable, see
 | [On-screen keyboard](#on-screen-keyboard) | The on-screen keyboard plugin, set up as the input method: pops up on text fields while detached, docks or floats |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
 | [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
-| [Screen rotation](#screen-rotation) | Rotate the built-in screen by hand or automatically from the accelerometer; touch and pen follow |
+| [Screen rotation](#screen-rotation) | The display panel plugin with Rotate left/right and accelerometer Auto; touch and pen follow |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
 ### On-screen keyboard
@@ -57,15 +57,12 @@ Dell Latitude 7350 Detachable, see
 - Trade-off: the copy doesn't get Omarchy's lock screen updates by itself.
 
 ### Screen rotation
-- `tablet-rotate normal|left|right|inverted` turns the built-in screen, and
-  touch and pen input with it; `tablet-rotate turn left|right` turns it a
-  quarter turn from where it is. Rotating by hand turns auto-rotate off.
-- `tablet-rotate auto on|off|toggle` follows the accelerometer
-  (`tablet-autorotate.service`, on by default; needs `iio-sensor-proxy`).
-  Turning it on snaps to how the device is held; off stays off across logins.
-- `tablet-rotate status` prints JSON for bar widgets and panels to show.
-- A Hyprland config reload puts the screen back to normal; auto-rotate
-  reapplies on the next turn.
+- The display panel in the bar comes from the
+  [omarchy-display-rotation](https://github.com/yeutterg/omarchy-display-rotation)
+  plugin: Omarchy's stock panel plus Rotate left, Rotate right and Auto (from
+  the accelerometer; needs `iio-sensor-proxy`). Touch and pen turn with the
+  screen. `install.sh` adds it.
+- From a terminal: `omarchy-shell display-rotation left|right|normal|auto|status`.
 
 ### Power saver on battery
 Omarchy remembers one power profile for AC and one for battery, and switches

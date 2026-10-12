@@ -145,26 +145,19 @@ button.
   `tablet.lock` is enabled. If the plugin fails to load, the screen can't
   lock: run `omarchy plugin enable omarchy.lock`.
 
-### Screen rotation, by hand or from the accelerometer — 2026-10-12
-- **Package:** `iio-sensor-proxy` (for auto-rotate; `monitor-sensor`).
-- **Files:**
-  - `home/.local/bin/tablet-rotate` — rotates the first eDP/LVDS/DSI output with
-    `hyprctl eval` (`hl.monitor` with its current mode, position and scale plus
-    `transform`), and sets `input:touchdevice` and `input:tablet` `output` and
-    `transform` to match. `turn left|right` steps a quarter turn from the
-    current rotation. `auto on|off|toggle` enables or disables the service;
-    `status` prints `{"transform","auto","sensor"}`.
-  - `home/.local/bin/tablet-autorotate` and
-    `home/.config/systemd/user/tablet-autorotate.service` — reads
-    `monitor-sensor --accel` and maps normal/left-up/bottom-up/right-up to
-    transforms 0/1/2/3, including the orientation reported at start, so
-    turning Auto on snaps to how the device is held. Enabled by `install.sh`;
-    exits cleanly without iio-sensor-proxy. Off is a state file
-    (`~/.local/state/omarchy-tablet/autorotate-off`, a unit condition) plus
-    `systemctl stop`, never `disable`: disabling a unit linked into the repo
-    deletes the link.
-- **Why:** Omarchy has no rotation command, and a rotated screen without
-  rotated touch input puts taps in the wrong place.
-- **Limits:** A Hyprland config reload reapplies the config's monitor rule
-  (normal) until auto-rotate sees the next turn. The left-up/right-up mapping
-  assumes a landscape-native panel; flip 1 and 3 if a device turns the wrong way.
+### Screen rotation, by hand or from the accelerometer — 2026-10-12, plugin since 2026-10-12
+- **Package:** `iio-sensor-proxy` (for Auto; `monitor-sensor`).
+- **Plugin:** [omarchy-display-rotation](https://github.com/yeutterg/omarchy-display-rotation)
+  (`io.github.yeutterg.display-rotation`), added and enabled by `install.sh`.
+  A clone of Omarchy's display panel (`clonedFrom: omarchy.monitor`) with a
+  Rotation row; its service rotates the first eDP/LVDS/DSI output with
+  `hyprctl eval` (monitor `transform`, plus `input:touchdevice` and
+  `input:tablet` `output`/`transform`), runs `monitor-sensor --accel` while
+  Auto is on, and turns the screen back after a Hyprland config reload.
+- **History:** First built here as `tablet-rotate`, `tablet-autorotate` and
+  `tablet-autorotate.service`, driven by a rotation row in the Dell repo's
+  display panel copy. Moved into one generic plugin so any tablet gets the row
+  and the Dell repo needs no panel copy; `install.sh` stops the old service.
+- **Why:** Omarchy has no rotation, and a rotated screen without rotated touch
+  input puts taps in the wrong place.
+- **Limits:** The accelerometer mapping assumes a landscape-native panel.
