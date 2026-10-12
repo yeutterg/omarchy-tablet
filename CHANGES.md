@@ -146,3 +146,15 @@ button.
   against this copy and port changes; the built-in stays disabled while
   `tablet.lock` is enabled. If the plugin fails to load, the screen can't
   lock: run `omarchy plugin enable omarchy.lock`.
+
+### Dictation key on the on-screen keyboard — 2026-10-12
+- **Files:** `home/.local/share/squeekboard/keyboards/us.yaml` and `us_wide.yaml`
+  — squeekboard 1.43.1's US layouts with a 🎤 key added between the
+  preferences key and space. Space gives up the key's width.
+- **Why:** Dictation from the tablet without the hardware keyboard. The key
+  sends F9, and Omarchy binds F9 to `voxtype record start` on press and
+  `voxtype record stop` on release, so holding the key records.
+- **Limits:** Only the US layout has the key. squeekboard layouts can't run
+  commands, so it depends on Omarchy's F9 binding and on voxtype being
+  installed. These are copies of upstream layouts, so a squeekboard update
+  that changes them won't show up here until they're re-copied.

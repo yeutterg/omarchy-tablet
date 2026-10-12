@@ -11,7 +11,7 @@ Dell Latitude 7350 Detachable, see
 
 | Customization | Summary |
 |---|---|
-| [On-screen keyboard](#on-screen-keyboard) | squeekboard pops up for text fields, only while the keyboard is detached |
+| [On-screen keyboard](#on-screen-keyboard) | squeekboard pops up for text fields, only while the keyboard is detached, with a 🎤 dictation key |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
 | [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
@@ -22,6 +22,8 @@ Dell Latitude 7350 Detachable, see
 - It's only enabled while the tablet-mode switch says the keyboard is detached.
   The switch is found from the kernel, not by device name.
 - Chromium gets the IME flags it needs to request the keyboard.
+- A 🎤 key next to space: hold it to dictate with Omarchy's voxtype (it sends
+  F9, the push-to-talk key). Needs voxtype set up (`omarchy-voxtype-install`).
 - Trade-offs: no fcitx-based compose sequences; apps without text-input-v3
   (most Electron apps) won't trigger the keyboard.
 
