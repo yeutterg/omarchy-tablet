@@ -2,3 +2,4 @@
 squeekboard
 jq
 libpulse
+iio-sensor-proxy

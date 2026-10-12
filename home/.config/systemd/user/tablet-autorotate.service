@@ -1,0 +1,13 @@
+[Unit]
+Description=Rotate the built-in screen with the accelerometer (omarchy-tablet)
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/tablet-autorotate
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

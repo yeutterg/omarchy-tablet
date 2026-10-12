@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Follow the accelerometer: rotate the built-in screen when the device turns.
+# Run by tablet-autorotate.service (tablet-rotate auto on|off). Needs
+# iio-sensor-proxy, whose monitor-sensor reports the orientation.
+
+set -uo pipefail
+
+# Without the sensor tool there is nothing to follow; exit cleanly so systemd
+# doesn't keep restarting.
+command -v monitor-sensor >/dev/null || { echo "monitor-sensor not found: install iio-sensor-proxy" >&2; exit 0; }
+
+# iio-sensor-proxy names which edge points up; Hyprland rotates counterclockwise.
+transform_for() {
+  case $1 in
+    normal) echo 0 ;;
+    left-up) echo 1 ;;
+    bottom-up) echo 2 ;;
+    right-up) echo 3 ;;
+    *) return 1 ;;
+  esac
+}
+
+last=""
+monitor-sensor --accel | while IFS= read -r line; do
+  # "=== Has accelerometer (orientation: normal)" at start,
+  # "    Accelerometer orientation changed: left-up" afterwards.
+  orientation=$(sed -nE 's/.*orientation(: | changed: )([a-z-]+)\)?$/\2/p' <<<"$line")
+  [[ -n $orientation && $orientation != "$last" ]] || continue
+  transform=$(transform_for "$orientation") || continue
+  last=$orientation
+  "$HOME/.local/bin/tablet-rotate" --apply "$transform"
+done

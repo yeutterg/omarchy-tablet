@@ -14,6 +14,7 @@ Dell Latitude 7350 Detachable, see
 | [On-screen keyboard](#on-screen-keyboard) | squeekboard pops up for text fields, only while the keyboard is detached, styled like Omarchy, with a dictation key |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
 | [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
+| [Screen rotation](#screen-rotation) | Rotate the built-in screen by hand or automatically from the accelerometer; touch and pen follow |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
 ### On-screen keyboard
@@ -54,6 +55,15 @@ Dell Latitude 7350 Detachable, see
   repo): `lock-pin set`. Remove with `lock-pin remove`.
 - Trade-off: the copy doesn't get Omarchy's lock screen updates by itself.
 
+### Screen rotation
+- `tablet-rotate normal|left|right|inverted` turns the built-in screen, and
+  touch and pen input with it. Picking a rotation by hand turns auto-rotate off.
+- `tablet-rotate auto on|off|toggle` follows the accelerometer
+  (`tablet-autorotate.service`, on by default; needs `iio-sensor-proxy`).
+- `tablet-rotate status` prints JSON for bar widgets and panels to show.
+- A Hyprland config reload puts the screen back to normal; auto-rotate
+  reapplies on the next turn.
+
 ### Power saver on battery
 Omarchy remembers one power profile for AC and one for battery, and switches
 when you plug in or unplug. With nothing saved, battery uses `balanced`;
@@ -69,7 +79,7 @@ Requires Omarchy on a tablet, convertible or detachable (DMI chassis type
 30–32), plus the packages in [packages.txt](packages.txt).
 
 ```bash
-sudo pacman -S --needed squeekboard jq libpulse
+sudo pacman -S --needed squeekboard jq libpulse iio-sensor-proxy
 git clone https://github.com/yeutterg/omarchy-tablet ~/dotfiles/omarchy-tablet
 ~/dotfiles/omarchy-tablet/install.sh
 hyprctl reload   # then log out and back in for the input method

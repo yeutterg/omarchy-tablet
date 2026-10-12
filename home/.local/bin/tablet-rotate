@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# Rotate the built-in screen, with touch and pen following it.
+#   tablet-rotate normal|left|right|inverted   (or 0|90|180|270)
+#                         rotate now; turns auto-rotate off
+#   tablet-rotate auto on|off|toggle
+#                         auto-rotate from the accelerometer
+#                         (tablet-autorotate.service, needs iio-sensor-proxy)
+#   tablet-rotate status  JSON: {"transform":0-3,"auto":true|false,"sensor":true|false}
+#   tablet-rotate --apply <0-3>
+#                         rotate without touching auto-rotate (used by the service)
+# Hyprland transforms: 0 normal, 1 90°, 2 180°, 3 270°. The built-in screen is
+# the first eDP/LVDS/DSI output. A Hyprland config reload puts the monitor rule
+# from the config back (normal); auto-rotate reapplies on the next turn.
+
+set -euo pipefail
+
+service=tablet-autorotate.service
+
+internal_monitor() {
+  hyprctl monitors -j | jq -r '[.[] | select(.name | test("^(eDP|LVDS|DSI)"))][0] // empty'
+}
+
+transform_for() {
+  case $1 in
+    normal | 0) echo 0 ;;
+    left | 90) echo 1 ;;
+    inverted | 180) echo 2 ;;
+    right | 270) echo 3 ;;
+    *) return 1 ;;
+  esac
+}
+
+apply() {
+  local transform=$1 monitor name mode position scale
+  monitor=$(internal_monitor)
+  [[ -n $monitor ]] || { echo "No built-in screen found" >&2; exit 1; }
+  name=$(jq -r .name <<<"$monitor")
+  [[ $name =~ ^[A-Za-z0-9-]+$ ]] || { echo "Unexpected monitor name: $name" >&2; exit 1; }
+  mode=$(jq -r '"\(.width)x\(.height)@\(.refreshRate)"' <<<"$monitor")
+  position=$(jq -r '"\(.x)x\(.y)"' <<<"$monitor")
+  scale=$(jq -r .scale <<<"$monitor")
+  hyprctl eval "
+    hl.monitor({ output = \"$name\", mode = \"$mode\", position = \"$position\", scale = $scale, transform = $transform })
+    hl.config({ input = {
+      touchdevice = { output = \"$name\", transform = $transform },
+      tablet = { output = \"$name\", transform = $transform },
+    } })" >/dev/null
+}
+
+auto_active() { systemctl --user is-active --quiet "$service"; }
+
+case "${1:-}" in
+  --apply)
+    [[ ${2:-} =~ ^[0-3]$ ]] || { echo "Usage: tablet-rotate --apply 0-3" >&2; exit 1; }
+    apply "$2"
+    ;;
+  auto)
+    case "${2:-}" in
+      on) systemctl --user enable --now "$service" ;;
+      off) systemctl --user disable --now "$service" ;;
+      toggle) if auto_active; then "$0" auto off; else "$0" auto on; fi ;;
+      *) echo "Usage: tablet-rotate auto on|off|toggle" >&2; exit 1 ;;
+    esac
+    ;;
+  status)
+    transform=$(internal_monitor | jq -r '.transform // 0')
+    sensor=false
+    command -v monitor-sensor >/dev/null && sensor=true
+    printf '{"transform":%s,"auto":%s,"sensor":%s}\n' "${transform:-0}" \
+      "$(auto_active && echo true || echo false)" "$sensor"
+    ;;
+  *)
+    transform=$(transform_for "${1:-}") ||
+      { echo "Usage: tablet-rotate normal|left|right|inverted|auto on|off|toggle|status" >&2; exit 1; }
+    # Picking a rotation by hand means it should stay put.
+    auto_active && systemctl --user disable --now "$service" >/dev/null 2>&1 || true
+    apply "$transform"
+    ;;
+esac

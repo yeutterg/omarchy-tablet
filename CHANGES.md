@@ -184,3 +184,22 @@ button.
   imported file doesn't exist and GTK 3 apps log a warning; `install.sh` renders
   it for the current theme.
 
+### Screen rotation, by hand or from the accelerometer — 2026-10-12
+- **Package:** `iio-sensor-proxy` (for auto-rotate; `monitor-sensor`).
+- **Files:**
+  - `home/.local/bin/tablet-rotate` — rotates the first eDP/LVDS/DSI output with
+    `hyprctl eval` (`hl.monitor` with its current mode, position and scale plus
+    `transform`), and sets `input:touchdevice` and `input:tablet` `output` and
+    `transform` to match. `auto on|off|toggle` enables or disables the service;
+    `status` prints `{"transform","auto","sensor"}`.
+  - `home/.local/bin/tablet-autorotate` and
+    `home/.config/systemd/user/tablet-autorotate.service` — reads
+    `monitor-sensor --accel` and maps normal/left-up/bottom-up/right-up to
+    transforms 0/1/2/3. Enabled by `install.sh`; exits cleanly without
+    iio-sensor-proxy.
+- **Why:** Omarchy has no rotation command, and a rotated screen without
+  rotated touch input puts taps in the wrong place.
+- **Limits:** A Hyprland config reload reapplies the config's monitor rule
+  (normal) until auto-rotate sees the next turn. The left-up/right-up mapping
+  assumes a landscape-native panel; flip 1 and 3 if a device turns the wrong way.
+
