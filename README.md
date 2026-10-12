@@ -62,6 +62,7 @@ Dell Latitude 7350 Detachable, see
   quarter turn from where it is. Rotating by hand turns auto-rotate off.
 - `tablet-rotate auto on|off|toggle` follows the accelerometer
   (`tablet-autorotate.service`, on by default; needs `iio-sensor-proxy`).
+  Turning it on snaps to how the device is held; off stays off across logins.
 - `tablet-rotate status` prints JSON for bar widgets and panels to show.
 - A Hyprland config reload puts the screen back to normal; auto-rotate
   reapplies on the next turn.

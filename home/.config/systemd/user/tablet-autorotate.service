@@ -1,6 +1,8 @@
 [Unit]
 Description=Rotate the built-in screen with the accelerometer (omarchy-tablet)
 After=graphical-session.target
+# Turned off with `tablet-rotate auto off` (or by rotating by hand).
+ConditionPathExists=!%h/.local/state/omarchy-tablet/autorotate-off
 PartOf=graphical-session.target
 
 [Service]

@@ -19,6 +19,16 @@
 set -euo pipefail
 
 service=tablet-autorotate.service
+# Auto-rotate is on unless this file exists. Start/stop, never enable/disable:
+# the unit file is a link into the repo, and `systemctl disable` deletes it.
+off_flag=${XDG_STATE_HOME:-$HOME/.local/state}/omarchy-tablet/autorotate-off
+
+auto_on() { rm -f "$off_flag"; systemctl --user start "$service"; }
+auto_off() {
+  mkdir -p "${off_flag%/*}"
+  touch "$off_flag"
+  systemctl --user stop "$service" 2>/dev/null || true
+}
 
 internal_monitor() {
   hyprctl monitors -j | jq -r '[.[] | select(.name | test("^(eDP|LVDS|DSI)"))][0] // empty'
@@ -65,13 +75,13 @@ case "${1:-}" in
       right) next=$(( (current + 3) % 4 )) ;;
       *) echo "Usage: tablet-rotate turn left|right" >&2; exit 1 ;;
     esac
-    auto_active && systemctl --user disable --now "$service" >/dev/null 2>&1 || true
+    auto_off
     apply "$next"
     ;;
   auto)
     case "${2:-}" in
-      on) systemctl --user enable --now "$service" ;;
-      off) systemctl --user disable --now "$service" ;;
+      on) auto_on ;;
+      off) auto_off ;;
       toggle) if auto_active; then "$0" auto off; else "$0" auto on; fi ;;
       *) echo "Usage: tablet-rotate auto on|off|toggle" >&2; exit 1 ;;
     esac
@@ -87,7 +97,7 @@ case "${1:-}" in
     transform=$(transform_for "${1:-}") ||
       { echo "Usage: tablet-rotate normal|left|right|inverted|turn left|right|auto on|off|toggle|status" >&2; exit 1; }
     # Picking a rotation by hand means it should stay put.
-    auto_active && systemctl --user disable --now "$service" >/dev/null 2>&1 || true
+    auto_off
     apply "$transform"
     ;;
 esac

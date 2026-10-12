@@ -23,9 +23,11 @@ transform_for() {
 
 last=""
 monitor-sensor --accel | while IFS= read -r line; do
-  # "=== Has accelerometer (orientation: normal)" at start,
-  # "    Accelerometer orientation changed: left-up" afterwards.
-  orientation=$(sed -nE 's/.*orientation(: | changed: )([a-z-]+)\)?$/\2/p' <<<"$line")
+  # "=== Has accelerometer (orientation: normal, tilt: vertical)" at start,
+  # "    Accelerometer orientation changed: left-up" afterwards. Applying the
+  # start value matters: turning Auto on after a manual rotation must snap to
+  # how the device is held now, not wait for the next turn.
+  orientation=$(sed -nE 's/.*orientation(:| changed:) ([a-z-]+).*/\2/p' <<<"$line")
   [[ -n $orientation && $orientation != "$last" ]] || continue
   transform=$(transform_for "$orientation") || continue
   last=$orientation

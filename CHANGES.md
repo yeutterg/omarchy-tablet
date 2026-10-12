@@ -157,8 +157,12 @@ button.
   - `home/.local/bin/tablet-autorotate` and
     `home/.config/systemd/user/tablet-autorotate.service` — reads
     `monitor-sensor --accel` and maps normal/left-up/bottom-up/right-up to
-    transforms 0/1/2/3. Enabled by `install.sh`; exits cleanly without
-    iio-sensor-proxy.
+    transforms 0/1/2/3, including the orientation reported at start, so
+    turning Auto on snaps to how the device is held. Enabled by `install.sh`;
+    exits cleanly without iio-sensor-proxy. Off is a state file
+    (`~/.local/state/omarchy-tablet/autorotate-off`, a unit condition) plus
+    `systemctl stop`, never `disable`: disabling a unit linked into the repo
+    deletes the link.
 - **Why:** Omarchy has no rotation command, and a rotated screen without
   rotated touch input puts taps in the wrong place.
 - **Limits:** A Hyprland config reload reapplies the config's monitor rule
