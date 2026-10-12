@@ -1,0 +1,4 @@
+/* On-screen keyboard theme, rendered by Omarchy from
+ * ~/.config/omarchy/themed/squeekboard.css.tpl (omarchy-tablet). Its selectors
+ * only match squeekboard, so other GTK 3 apps are unaffected. */
+@import url("../../.local/state/omarchy/current/theme/squeekboard.css");

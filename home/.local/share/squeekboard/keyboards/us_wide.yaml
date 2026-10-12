@@ -39,7 +39,7 @@ buttons:
         # Hold to dictate: F9 is Omarchy's voxtype push-to-talk bind
         keysym: "F9"
         outline: "special"
-        label: "🎤"
+        icon: "audio-input-microphone-symbolic"
     show_upper:
         action:
             locking:

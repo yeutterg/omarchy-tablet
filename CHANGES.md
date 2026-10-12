@@ -148,9 +148,11 @@ button.
   lock: run `omarchy plugin enable omarchy.lock`.
 
 ### Dictation key on the on-screen keyboard — 2026-10-12
-- **Files:** `home/.local/share/squeekboard/keyboards/us.yaml` and `us_wide.yaml`
-  — squeekboard 1.43.1's US layouts with a 🎤 key added between the
-  preferences key and space. Space gives up the key's width.
+- **Files:** `home/.local/share/squeekboard/keyboards/us.yaml`, `us_wide.yaml`
+  and `terminal/us.yaml`, `terminal/us_wide.yaml` — squeekboard 1.43.1's US
+  layouts (squeekboard shows the terminal ones when a terminal is focused) with
+  a microphone key added between the preferences key and space. Space gives up
+  the key's width.
 - **Why:** Dictation from the tablet without the hardware keyboard. The key
   sends F9, and Omarchy binds F9 to `voxtype record start` on press and
   `voxtype record stop` on release, so holding the key records.
@@ -158,3 +160,27 @@ button.
   commands, so it depends on Omarchy's F9 binding and on voxtype being
   installed. These are copies of upstream layouts, so a squeekboard update
   that changes them won't show up here until they're re-copied.
+
+### On-screen keyboard styled like Omarchy — 2026-10-12
+- **Files:**
+  - `home/.config/omarchy/themed/squeekboard.css.tpl` — an Omarchy theme
+    template, so every theme change renders `squeekboard.css` into the current
+    theme with its colors. Square keys with thin borders, letters on the lighter
+    background, shift/backspace/123/settings darker and dimmer, Enter outlined
+    in the accent color, pressed keys and caps lock filled with the accent, the
+    microphone key red while held, an accent line along the top. Font is
+    `monospace`, which Omarchy points at its chosen font.
+  - `home/.config/gtk-3.0/gtk.css` — imports that file. squeekboard only loads
+    its built-in stylesheet, and GTK's user stylesheet is the only way to
+    override it. The selectors (`sq_view`, `sq_button`) only match squeekboard.
+  - `home/.local/bin/squeekboard-restart`, called by
+    `home/.config/omarchy/hooks/theme-set.d/squeekboard` and `font-set.d/squeekboard`
+    — squeekboard reads its stylesheet only at start, so it's restarted on a
+    theme or font change, staying shown or hidden as it was.
+- **Why:** squeekboard's default look is GNOME's (rounded grey keys, Cantarell),
+  which clashed with the rest of Omarchy.
+- **Costs:** This repo owns `~/.config/gtk-3.0/gtk.css`; any other GTK 3 user
+  CSS has to go in this file. Until a theme is set once after install, the
+  imported file doesn't exist and GTK 3 apps log a warning; `install.sh` renders
+  it for the current theme.
+

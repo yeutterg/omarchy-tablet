@@ -57,6 +57,17 @@ install_plugins() {
   done
 }
 
+# Omarchy renders themed templates only on a theme change, so render the
+# on-screen keyboard's stylesheet for the current theme now.
+render_keyboard_theme() {
+  local theme=$HOME/.local/state/omarchy/current/theme
+  [[ -f $theme/colors.toml ]] || return 0
+  omarchy-theme-color --file "$theme/colors.toml" --all |
+    while IFS=$'\t' read -r key value; do printf 's|{{ %s }}|%s|g\n' "$key" "$value"; done |
+    sed -f - "$repo/home/.config/omarchy/themed/squeekboard.css.tpl" >"$theme/squeekboard.css"
+  "$repo/home/.local/bin/squeekboard-restart"
+}
+
 # Remove links into this repo whose file was moved or deleted here.
 prune_stale_links() {
   local link
@@ -129,6 +140,7 @@ default_battery_power_saver() {
 
 link_tree
 install_plugins
+render_keyboard_theme
 prune_stale_links
 enable_units
 check_packages
