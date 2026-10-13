@@ -14,6 +14,7 @@ Dell Latitude 7350 Detachable, see
 | [On-screen keyboard](#on-screen-keyboard) | The on-screen keyboard plugin, set up as the input method: pops up on text fields while detached, docks or floats |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
 | [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
+| [Bar stays put in tablet mode](#bar-stays-put-in-tablet-mode) | A finger can't drag the bar to another edge while detached |
 | [Screen rotation](#screen-rotation) | The display panel plugin with Rotate left/right and accelerometer Auto; touch and pen follow |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
@@ -55,6 +56,12 @@ Dell Latitude 7350 Detachable, see
 - **Set it up** (stored as a salted hash in `~/.local/state/omarchy-lock-pin`,
   never in this repo):
   `~/.config/omarchy/plugins/io.github.yeutterg.lock-pin/lock-pin set`.
+
+### Bar stays put in tablet mode
+- Omarchy moves the bar when its middle is held and dragged, which a finger
+  does by accident. `bar-position-guard` (user service) puts it back if it
+  moves while the keyboard is detached, with a short notification. Attached,
+  moving the bar works as usual. Tablet mode comes from the keyboard plugin.
 
 ### Screen rotation
 - The display panel in the bar comes from the

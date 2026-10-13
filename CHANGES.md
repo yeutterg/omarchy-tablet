@@ -146,3 +146,17 @@ button.
 - **Why:** Omarchy has no rotation, and a rotated screen without rotated touch
   input puts taps in the wrong place.
 - **Limits:** The accelerometer mapping assumes a landscape-native panel.
+
+### Bar stays put in tablet mode — 2026-10-12
+- **Files:** `home/.local/bin/bar-position-guard`,
+  `home/.config/systemd/user/bar-position-guard.service`.
+- **Change:** watches `~/.config/omarchy/shell.json` with inotify; when
+  `bar.position` changes while the on-screen keyboard plugin reports tablet
+  mode, runs `omarchy-bar position <previous>` and notifies. Otherwise the new
+  position is kept.
+- **Why:** The bar's centre drag-to-move (press-and-hold 200 ms) has no
+  setting, and replacing the whole bar would cut third-party bar widgets off
+  from their services.
+- **Limits:** The bar visibly moves and snaps back. Needs the keyboard plugin
+  for tablet mode.
+
