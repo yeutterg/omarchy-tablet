@@ -43,7 +43,7 @@ Dell Latitude 7350 Detachable, see
 - **Power button:** a short press locks and turns the screen off (press again
   to wake). With Stay Awake on the machine keeps running; once it's off, it
   idles to sleep as usual. Hold the button (0.7 s) for Omarchy's system menu
-  (suspend, restart, shut down). A double report of one press (common on
+  (suspend, restart, shut down); a short press closes it again. A double report of one press (common on
   tablets) is ignored.
 - **Low battery:** Stay Awake turns off, and a closed machine on battery with no
   external display suspends.

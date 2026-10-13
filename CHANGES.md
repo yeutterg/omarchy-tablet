@@ -12,6 +12,7 @@ detachables in general. Git history has the exact diffs.
   both press (`down`) and release (`up`); the script times the press itself,
   because Hyprland's long-press bind fires at the key repeat delay (250 ms),
   which an ordinary tap reaches.
+- **Menu open:** a short press closes it instead of locking.
 - **Why:** Lock like a phone; reboot and shut down stay one hold away.
 - **While locked,** a short press wakes the lock screen, which blanks itself
   again after a few idle seconds. Hyprland turns the display on for any key

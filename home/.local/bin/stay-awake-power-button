@@ -5,7 +5,7 @@
 #     keeps running while Omarchy's Stay Awake is on, and idles to sleep as
 #     usual once it's off.
 #   Long press (held LONG_MS): open Omarchy's system menu (lock, suspend,
-#     restart, shut down).
+#     restart, shut down). A short press while it's open closes it.
 # Hyprland's own long-press bind fires at the key repeat delay (250 ms), which
 # a normal tap already reaches, so the press is timed here instead.
 
@@ -20,6 +20,13 @@ screen_on() {
 }
 
 short_press() {
+  # The menu is open (a long press opened it): close it instead.
+  if hyprctl layers -j 2>/dev/null | jq -e '[.[].levels[][] | select(.namespace == "omarchy-menu")] | length > 0' >/dev/null; then
+    echo "$now" >"$state/power-button-acted"
+    logger -t stay-awake-power-button "short press: close menu"
+    omarchy-menu close
+    return
+  fi
   # Tablets can report one press from two devices (the ACPI "Power Button"
   # and the vendor HID buttons). Without this, the second report undoes the
   # first: the screen wakes, then locks and blanks again.
