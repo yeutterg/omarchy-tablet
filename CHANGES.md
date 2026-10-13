@@ -13,9 +13,12 @@ detachables in general. Git history has the exact diffs.
   because Hyprland's long-press bind fires at the key repeat delay (250 ms),
   which an ordinary tap reaches.
 - **Why:** Lock like a phone; reboot and shut down stay one hold away.
-- **Lock first, then blank:** the screen turns off only once the lock screen is
-  up (up to 3 s). The lock screen appearing under the pointer counts as
-  activity and woke the display about a second after it went dark.
+- **While locked,** a short press wakes the lock screen, which blanks itself
+  again after a few idle seconds. Hyprland turns the display on for any key
+  press, so by release the script can't tell whether it was dark.
+- **Needs omarchy-lock-pin 0.1.2:** the lock screen appearing under the
+  pointer counted as movement and woke the display about a second after the
+  press blanked it.
 
 ### On-screen keyboard plugin as the input method — 2026-10-04, plugin since 2026-10-12
 - **Package:** `python-pywayland` (for the plugin's helper).

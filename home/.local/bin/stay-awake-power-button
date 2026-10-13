@@ -31,19 +31,15 @@ short_press() {
   fi
   echo "$now" >"$state/power-button-acted"
   logger -t stay-awake-power-button "short press"
-  if screen_on; then
+  # Locked: wake to the lock screen. Hyprland lights the display on any key
+  # press, so whether it was dark can't be read back by release time; the
+  # lock screen blanks itself again after a few idle seconds.
+  if omarchy-shell lock status 2>/dev/null | jq -e '.locked or .requested' >/dev/null; then
+    omarchy-system-wake
+  else
     omarchy-system-lock >/dev/null 2>&1 || true
-    # The lock screen takes a second or so to appear, and appearing under the
-    # pointer counts as activity that wakes the display. Blank once it's up.
-    for _ in {1..30}; do
-      omarchy-shell lock status 2>/dev/null | jq -e .secure >/dev/null && break
-      sleep 0.1
-    done
-    sleep 0.3
     omarchy-brightness-keyboard off
     omarchy-brightness-display off
-  else
-    omarchy-system-wake
   fi
 }
 
