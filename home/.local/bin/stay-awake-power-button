@@ -33,6 +33,13 @@ short_press() {
   logger -t stay-awake-power-button "short press"
   if screen_on; then
     omarchy-system-lock >/dev/null 2>&1 || true
+    # The lock screen takes a second or so to appear, and appearing under the
+    # pointer counts as activity that wakes the display. Blank once it's up.
+    for _ in {1..30}; do
+      omarchy-shell lock status 2>/dev/null | jq -e .secure >/dev/null && break
+      sleep 0.1
+    done
+    sleep 0.3
     omarchy-brightness-keyboard off
     omarchy-brightness-display off
   else
