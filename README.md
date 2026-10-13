@@ -40,9 +40,11 @@ Dell Latitude 7350 Detachable, see
 - **herdr agents:** Stay Awake turns on while any herdr agent is working and
   off again once they've all stopped, unless you turned it on yourself.
   Turning it off by hand mid-run sticks until the agents stop.
-- **Power button:** while Stay Awake is on, it locks and turns the screen off
-  (press again to wake); otherwise it opens the system menu as usual. A
-  double report of one press (common on tablets) is ignored.
+- **Power button:** a short press locks and turns the screen off (press again
+  to wake). With Stay Awake on the machine keeps running; once it's off, it
+  idles to sleep as usual. Hold the button (0.7 s) for Omarchy's system menu
+  (suspend, restart, shut down). A double report of one press (common on
+  tablets) is ignored.
 - **Low battery:** Stay Awake turns off, and a closed machine on battery with no
   external display suspends.
 

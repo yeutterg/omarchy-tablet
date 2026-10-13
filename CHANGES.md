@@ -3,6 +3,17 @@
 Every intentional deviation from what Omarchy ships, for tablets and
 detachables in general. Git history has the exact diffs.
 
+### Power button: short press locks, hold for the menu — 2026-10-12
+- **Files:** `home/.local/bin/stay-awake-power-button`,
+  `home/.config/hypr/extras/50-tablet.lua`
+- **Change:** A short press locks and turns the screen off whether or not Stay
+  Awake is on (before, with Stay Awake off it opened the system menu). Holding
+  the button for 0.7 s opens the system menu. Hyprland now runs the script on
+  both press (`down`) and release (`up`); the script times the press itself,
+  because Hyprland's long-press bind fires at the key repeat delay (250 ms),
+  which an ordinary tap reaches.
+- **Why:** Lock like a phone; reboot and shut down stay one hold away.
+
 ### On-screen keyboard plugin as the input method — 2026-10-04, plugin since 2026-10-12
 - **Package:** `python-pywayland` (for the plugin's helper).
 - **Plugin:** [omarchy-on-screen-keyboard](https://github.com/yeutterg/omarchy-on-screen-keyboard)
