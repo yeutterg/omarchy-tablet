@@ -22,8 +22,8 @@ Dell Latitude 7350 Detachable, see
 ### On-screen keyboard
 - The keyboard is a separate Omarchy plugin,
   [omarchy-on-screen-keyboard](https://github.com/yeutterg/omarchy-on-screen-keyboard):
-  drawn in Omarchy's style, docked or floating and draggable, with a dictation
-  key and a bar button to show or hide it. `install.sh` adds it and puts the
+  drawn in Omarchy's style, with swipe typing, docked or floating and
+  draggable, a dictation key and a bar button to show or hide it. `install.sh` adds it and puts the
   button in the bar.
 - It pops up on text fields while the tablet-mode switch says the keyboard is
   detached.
