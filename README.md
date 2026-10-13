@@ -14,8 +14,8 @@ Dell Latitude 7350 Detachable, see
 | [On-screen keyboard](#on-screen-keyboard) | The on-screen keyboard plugin, set up as the input method: pops up on text fields while detached, docks or floats |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
 | [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
-| [Bar stays put in tablet mode](#bar-stays-put-in-tablet-mode) | A finger can't drag the bar to another edge while detached |
-| [Tray menus on tap](#tray-menus-on-tap) | Tapping a tray icon shows its menu instead of opening the app |
+| [Bar stays put in tablet mode](#bar-stays-put-in-tablet-mode) | Dragging the bar to another edge is off while detached |
+| [Tray for touch](#tray-for-touch) | Tap the tray arrow to open the drawer; the opening tap can't launch an app |
 | [Screen rotation](#screen-rotation) | The display panel plugin with Rotate left/right and accelerometer Auto; touch and pen follow |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
@@ -60,15 +60,17 @@ Dell Latitude 7350 Detachable, see
 
 ### Bar stays put in tablet mode
 - Omarchy moves the bar when its middle is held and dragged, which a finger
-  does by accident. `bar-position-guard` (user service) puts it back if it
-  moves while the keyboard is detached, with a short notification. Attached,
-  moving the bar works as usual. Tablet mode comes from the keyboard plugin.
+  does by accident. While the keyboard is detached, the on-screen keyboard
+  plugin turns that drag off (its `lockBarInTabletMode` option). Attached,
+  moving the bar works as usual.
 
-### Tray menus on tap
-- A touchscreen has no right click, so Omarchy's tray had no way to reach an
-  app's menu, and tapping 1Password opened its full window. The
-  [omarchy-tray-menu](https://github.com/yeutterg/omarchy-tray-menu) plugin
-  makes a click or tap show the menu; apps without one still open.
+### Tray for touch
+- Omarchy's tray drawer opens on hover, and a finger only hovers while it
+  touches: a tap opened it for an instant and launched whichever app slid under
+  the finger (1Password, full screen). The
+  [omarchy-tray-touch](https://github.com/yeutterg/omarchy-tray-touch) plugin
+  makes a tap on the arrow keep the drawer open and ignores the opening tap.
+  Hover still works with a mouse or trackpad.
 
 ### Screen rotation
 - The display panel in the bar comes from the
@@ -102,7 +104,7 @@ hyprctl reload   # then log out and back in for the input method
 
 `install.sh` symlinks `home/` into `$HOME` (a real file in the way is moved to
 `<file>.pre-dotfiles`), adds the plugins (on-screen keyboard, display with
-rotation, lock screen PIN pad, tray menus) with `omarchy plugin add`, enables the systemd
+rotation, lock screen PIN pad, tray for touch) with `omarchy plugin add`, enables the systemd
 user units, and adds one line to
 `~/.config/hypr/hyprland.lua` that loads `~/.config/hypr/extras/*.lua` in name
 order. This repo's Hyprland settings are `extras/50-tablet.lua`; device repos

@@ -148,25 +148,21 @@ button.
 - **Limits:** The accelerometer mapping assumes a landscape-native panel.
 
 ### Bar stays put in tablet mode — 2026-10-12
-- **Files:** `home/.local/bin/bar-position-guard`,
-  `home/.config/systemd/user/bar-position-guard.service`.
-- **Change:** watches `~/.config/omarchy/shell.json` with inotify; when
-  `bar.position` changes while the on-screen keyboard plugin reports tablet
-  mode, runs `omarchy-bar position <previous>` and notifies. Otherwise the new
-  position is kept.
-- **Why:** The bar's centre drag-to-move (press-and-hold 200 ms) has no
-  setting, and replacing the whole bar would cut third-party bar widgets off
-  from their services.
-- **Limits:** The bar visibly moves and snaps back. Needs the keyboard plugin
-  for tablet mode.
-
-### Tray: click or tap shows the menu — 2026-10-12
-- **Plugin:** [omarchy-tray-menu](https://github.com/yeutterg/omarchy-tray-menu)
-  (`io.github.yeutterg.tray-menu`, `clonedFrom: omarchy.tray`), added by
-  `install.sh`. Stock tray except a left click shows the item's menu when it
-  has one (Omarchy: activates the app; menu only on right click).
-- **Why:** No right click on a touchscreen; tapping 1Password opened its
-  window full screen instead of its menu.
-- **Cost:** With a mouse, opening an app from its tray icon now goes through
-  its menu (or middle click).
-
+- **Plugin:** the on-screen keyboard plugin (0.2.3) disables the bar's centre
+  drag area while in tablet mode (`lockBarInTabletMode`, on by default).
+- **Why:** The bar's drag-to-move (press-and-hold 200 ms) has no setting, and a
+  finger triggers it by accident.
+- **History:** First a `bar-position-guard` user service here that put the bar
+  back after a move; replaced the same day by disabling the drag itself.
+### Tray for touch — 2026-10-12
+- **Plugin:** [omarchy-tray-touch](https://github.com/yeutterg/omarchy-tray-touch)
+  (`io.github.yeutterg.tray-touch`, `clonedFrom: omarchy.tray`), added by
+  `install.sh`. Stock tray except: a left click/tap on the chevron keeps the
+  drawer open (Omarchy: hover only), icon clicks in the first 500 ms after it
+  opens are ignored, and it closes after an icon is used or 6 s idle.
+- **Why:** A finger only hovers while touching, so the drawer opened for one
+  tap and that tap launched the app sliding under it (1Password full screen);
+  icons couldn't be reached on purpose.
+- **History:** First published as omarchy-tray-menu (click shows the menu
+  instead of opening the app); replaced the same day, since app clicks should
+  stay stock.
