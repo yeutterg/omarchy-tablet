@@ -160,3 +160,13 @@ button.
 - **Limits:** The bar visibly moves and snaps back. Needs the keyboard plugin
   for tablet mode.
 
+### Tray: click or tap shows the menu — 2026-10-12
+- **Plugin:** [omarchy-tray-menu](https://github.com/yeutterg/omarchy-tray-menu)
+  (`io.github.yeutterg.tray-menu`, `clonedFrom: omarchy.tray`), added by
+  `install.sh`. Stock tray except a left click shows the item's menu when it
+  has one (Omarchy: activates the app; menu only on right click).
+- **Why:** No right click on a touchscreen; tapping 1Password opened its
+  window full screen instead of its menu.
+- **Cost:** With a mouse, opening an app from its tray icon now goes through
+  its menu (or middle click).
+

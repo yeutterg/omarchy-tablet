@@ -42,6 +42,7 @@ plugin_deps=(
   "io.github.yeutterg.onscreen-keyboard https://github.com/yeutterg/omarchy-on-screen-keyboard"
   "io.github.yeutterg.display-rotation https://github.com/yeutterg/omarchy-display-rotation"
   "io.github.yeutterg.lock-pin https://github.com/yeutterg/omarchy-lock-pin"
+  "io.github.yeutterg.tray-menu https://github.com/yeutterg/omarchy-tray-menu"
 )
 install_plugin_deps() {
   local dep id url
