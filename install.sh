@@ -78,14 +78,20 @@ install_plugin_deps() {
 # time. After a Hyprland update, `hyprpm update` rebuilds it.
 install_hyprgrass() {
   command -v hyprpm >/dev/null || return 0
-  hyprpm list 2>/dev/null | grep -q hyprgrass && return 0
+  hyprpm list 2>/dev/null | grep -A1 'Plugin hyprgrass$' | grep -q 'enabled:.*true' && return 0
   if ! pacman -Q meson glm &>/dev/null; then
     echo "Skipping hyprgrass: install meson and glm first (see packages.txt)"
     return 0
   fi
-  hyprpm update && hyprpm add https://github.com/horriblename/hyprgrass && hyprpm enable hyprgrass \
-    && hyprpm reload -n && echo "Installed hyprgrass" \
-    || echo "Couldn't install hyprgrass; run: hyprpm update && hyprpm add https://github.com/horriblename/hyprgrass && hyprpm enable hyprgrass"
+  # The repo's optional extras (hyprgrass-backlight, -pulse) may fail to build,
+  # which makes update/add exit non-zero; only hyprgrass itself matters.
+  hyprpm update
+  hyprpm add https://github.com/horriblename/hyprgrass
+  if hyprpm enable hyprgrass && hyprpm reload -n; then
+    echo "Installed hyprgrass"
+  else
+    echo "Couldn't install hyprgrass; run: hyprpm update && hyprpm add https://github.com/horriblename/hyprgrass && hyprpm enable hyprgrass"
+  fi
 }
 
 # Remove links into this repo whose file was moved or deleted here.
