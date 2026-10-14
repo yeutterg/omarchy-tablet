@@ -4,3 +4,4 @@ jq
 libpulse
 iio-sensor-proxy
 meson
+glm

@@ -79,8 +79,8 @@ install_plugin_deps() {
 install_hyprgrass() {
   command -v hyprpm >/dev/null || return 0
   hyprpm list 2>/dev/null | grep -q hyprgrass && return 0
-  if ! pacman -Q meson &>/dev/null; then
-    echo "Skipping hyprgrass: install meson first (see packages.txt)"
+  if ! pacman -Q meson glm &>/dev/null; then
+    echo "Skipping hyprgrass: install meson and glm first (see packages.txt)"
     return 0
   fi
   hyprpm update && hyprpm add https://github.com/horriblename/hyprgrass && hyprpm enable hyprgrass \

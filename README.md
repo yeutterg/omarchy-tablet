@@ -81,7 +81,7 @@ Dell Latitude 7350 Detachable, see
   places; floating ones move freely.
 - Comes from the [hyprgrass](https://github.com/horriblename/hyprgrass)
   Hyprland plugin, which `install.sh` builds and enables with hyprpm (needs
-  `meson`, and asks for sudo the first time). Settings in
+  `meson` and `glm`, and asks for sudo the first time). Settings in
   `hypr/extras/55-touch-windows.lua`.
 - **After a Hyprland update** run `hyprpm update` to rebuild it; until then the
   plugin doesn't load (you get a notification at login) and touch works as

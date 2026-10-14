@@ -5,7 +5,7 @@ detachables in general. Git history has the exact diffs.
 
 ### Move and resize windows by touch — 2026-10-14
 - **Files:** `home/.config/hypr/extras/55-touch-windows.lua`, `install.sh`
-  (`install_hyprgrass`), `packages.txt` (`meson`)
+  (`install_hyprgrass`), `packages.txt` (`meson`, `glm`)
 - **Change:** Adds the hyprgrass plugin (not part of Omarchy) through hyprpm,
   loaded at login with `hyprpm reload -n`. Long-press on a border or gap
   resizes (`resize_on_border_long_press`); a two-finger long press starts
