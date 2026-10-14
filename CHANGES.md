@@ -3,6 +3,17 @@
 Every intentional deviation from what Omarchy ships, for tablets and
 detachables in general. Git history has the exact diffs.
 
+### Move and resize windows by touch — 2026-10-14
+- **Files:** `home/.config/hypr/extras/55-touch-windows.lua`, `install.sh`
+  (`install_hyprgrass`), `packages.txt` (`meson`)
+- **Change:** Adds the hyprgrass plugin (not part of Omarchy) through hyprpm,
+  loaded at login with `hyprpm reload -n`. Long-press on a border or gap
+  resizes (`resize_on_border_long_press`); a two-finger long press starts
+  Hyprland's window drag. Long-press delay 400 ms, sensitivity 4.0.
+- **Why:** Hyprland has no touchscreen move/resize of its own.
+- **Relies on:** hyprgrass having a pin for the installed Hyprland version in
+  its `hyprpm.toml`. After an Omarchy update bumps Hyprland, `hyprpm update`.
+
 ### Power button: short press locks, hold for the menu — 2026-10-12
 - **Files:** `home/.local/bin/stay-awake-power-button`,
   `home/.config/hypr/extras/50-tablet.lua`

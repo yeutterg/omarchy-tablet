@@ -73,6 +73,21 @@ install_plugin_deps() {
   fi
 }
 
+# hyprgrass: touchscreen move/resize for windows (hypr/extras/55-touch-windows.lua).
+# hyprpm builds it against the running Hyprland; it asks for sudo the first
+# time. After a Hyprland update, `hyprpm update` rebuilds it.
+install_hyprgrass() {
+  command -v hyprpm >/dev/null || return 0
+  hyprpm list 2>/dev/null | grep -q hyprgrass && return 0
+  if ! pacman -Q meson &>/dev/null; then
+    echo "Skipping hyprgrass: install meson first (see packages.txt)"
+    return 0
+  fi
+  hyprpm update && hyprpm add https://github.com/horriblename/hyprgrass && hyprpm enable hyprgrass \
+    && hyprpm reload -n && echo "Installed hyprgrass" \
+    || echo "Couldn't install hyprgrass; run: hyprpm update && hyprpm add https://github.com/horriblename/hyprgrass && hyprpm enable hyprgrass"
+}
+
 # Remove links into this repo whose file was moved or deleted here.
 prune_stale_links() {
   local link
@@ -145,6 +160,7 @@ default_battery_power_saver() {
 
 link_tree
 install_plugin_deps
+install_hyprgrass
 prune_stale_links
 enable_units
 check_packages

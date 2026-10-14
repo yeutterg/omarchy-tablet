@@ -16,6 +16,7 @@ Dell Latitude 7350 Detachable, see
 | [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
 | [Bar stays put in tablet mode](#bar-stays-put-in-tablet-mode) | Dragging the bar to another edge is off while detached |
 | [Tray for touch](#tray-for-touch) | Tap the tray arrow to open the drawer; the opening tap can't launch an app |
+| [Move and resize windows by touch](#move-and-resize-windows-by-touch) | Long-press a border to resize, two-finger long-press a window to move it (hyprgrass) |
 | [Screen rotation](#screen-rotation) | The display panel plugin with Rotate left/right and accelerometer Auto; touch and pen follow |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
@@ -73,6 +74,18 @@ Dell Latitude 7350 Detachable, see
   [omarchy-tray-touch](https://github.com/yeutterg/omarchy-tray-touch) plugin
   makes a tap on the arrow keep the drawer open and ignores the opening tap.
   Hover still works with a mouse or trackpad.
+
+### Move and resize windows by touch
+- **Resize:** long-press a window's border or the gap between windows, then drag.
+- **Move:** long-press a window with two fingers, then drag. Tiled windows swap
+  places; floating ones move freely.
+- Comes from the [hyprgrass](https://github.com/horriblename/hyprgrass)
+  Hyprland plugin, which `install.sh` builds and enables with hyprpm (needs
+  `meson`, and asks for sudo the first time). Settings in
+  `hypr/extras/55-touch-windows.lua`.
+- **After a Hyprland update** run `hyprpm update` to rebuild it; until then the
+  plugin doesn't load (you get a notification at login) and touch works as
+  before.
 
 ### Screen rotation
 - The display panel in the bar comes from the

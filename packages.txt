@@ -3,3 +3,4 @@ python-pywayland
 jq
 libpulse
 iio-sensor-proxy
+meson
