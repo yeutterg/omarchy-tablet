@@ -79,7 +79,13 @@ if ! sudo efibootmgr | grep -qF "$BACKUP_LABEL"; then
   # --create-only adds the entry without putting it first in the boot order.
   sudo efibootmgr --create-only --disk "$disk" --part "$part" --label "$BACKUP_LABEL" --loader "\\EFI\\omarchy-tablet\\$BACKUP_NAME" >/dev/null
 fi
-sudo efibootmgr | grep -F "$BACKUP_LABEL"
+# Last in the boot order: listed in the F12 menu, never booted by itself.
+entry=$(sudo efibootmgr | sed -n "s/^Boot\([0-9A-F]\{4\}\)\*\? $BACKUP_LABEL.*/\1/p" | head -1)
+order=$(sudo efibootmgr | sed -n 's/^BootOrder: //p')
+if [[ -n $entry && ,$order, != *",$entry,"* ]]; then
+  sudo efibootmgr --bootorder "${order:+$order,}$entry" >/dev/null
+fi
+sudo efibootmgr | grep -E "BootOrder|$BACKUP_LABEL"
 
 say "Configuring unl0kr"
 sudo tee /etc/unl0kr.conf >/dev/null <<'EOF'
