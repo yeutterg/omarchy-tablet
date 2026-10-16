@@ -3,6 +3,20 @@
 Every intentional deviation from what Omarchy ships, for tablets and
 detachables in general. Git history has the exact diffs.
 
+### Touch keyboard at disk unlock (opt-in) — 2026-10-16
+- **Files:** `system/unl0kr/setup.sh` (run by hand); on the system it writes
+  `/etc/unl0kr.conf`, `/etc/mkinitcpio.conf.d/zz-omarchy-tablet-unl0kr.conf`,
+  `/boot/EFI/omarchy-tablet/omarchy-pre-unl0kr.efi` and a firmware boot entry.
+- **Change:** Omarchy's initramfs hooks `plymouth` and `encrypt` become
+  `unl0kr` (AUR `buffybox`), a touch keyboard for the LUKS prompt. Touchscreen
+  driver modules are added to the initramfs.
+- **Why:** Resuming from hibernate (and any boot) asks for the disk password
+  before Omarchy runs; detached, there was no keyboard to type it.
+- **Relies on:** Omarchy keeping the busybox `encrypt` hook and
+  `cryptdevice=`. If Omarchy moves to `sd-encrypt`, switch to unl0kr's
+  `sd-unl0kr` hook. After an unl0kr update, the boot image is rebuilt by the
+  usual pacman hook.
+
 ### Move and resize windows by touch — 2026-10-14
 - **Files:** `home/.config/hypr/extras/55-touch-windows.lua`, `install.sh`
   (`install_hyprgrass`), `packages.txt` (`meson`, `glm`)
