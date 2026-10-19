@@ -17,7 +17,6 @@ Dell Latitude 7350 Detachable, see
 | [Bar stays put in tablet mode](#bar-stays-put-in-tablet-mode) | Dragging the bar to another edge is off while detached |
 | [Tray for touch](#tray-for-touch) | Tap the tray arrow to open the drawer; the opening tap can't launch an app |
 | [Move and resize windows by touch](#move-and-resize-windows-by-touch) | Long-press a border to resize, two-finger long-press a window to move it (hyprgrass) |
-| [Touch keyboard at disk unlock](#touch-keyboard-at-disk-unlock) | Opt-in: unl0kr replaces the boot password prompt, so boot and hibernate resume can be unlocked detached |
 | [Screen rotation](#screen-rotation) | The display panel plugin with Rotate left/right and accelerometer Auto; touch and pen follow |
 | [Power saver on battery](#power-saver-on-battery) | Battery defaults to the power-saver profile instead of balanced |
 
@@ -87,28 +86,6 @@ Dell Latitude 7350 Detachable, see
 - **After a Hyprland update** run `hyprpm update` to rebuild it; until then the
   plugin doesn't load (you get a notification at login) and touch works as
   before.
-
-### Touch keyboard at disk unlock
-- Omarchy encrypts the disk, so every boot and every resume from hibernate
-  starts with a password prompt, before the PIN lock screen exists. With the
-  keyboard detached there was no way to type it.
-- **Opt-in**, because it changes the boot image: run
-  `system/unl0kr/setup.sh` (asks for sudo; `install.sh` doesn't run it). It
-  installs [unl0kr](https://gitlab.postmarketos.org/postmarketOS/buffybox)
-  (AUR `buffybox`), whose touch keyboard replaces Plymouth's prompt. The
-  hardware keyboard still works there.
-- Nothing else about booting changes: unl0kr's hook stands in for Omarchy's
-  `encrypt` hook and reads the same `cryptdevice=` option, so the kernel
-  command line, hibernate resume and snapshot boot are untouched. The drop-in
-  `/etc/mkinitcpio.conf.d/zz-omarchy-tablet-unl0kr.conf` edits Omarchy's hook
-  list (Plymouth out, `encrypt` → `unl0kr`) and adds the touchscreen's
-  drivers, detected by the script.
-- **Safety net:** the script first copies the working boot image to
-  `/boot/EFI/omarchy-tablet/omarchy-pre-unl0kr.efi` and adds it to the
-  firmware boot menu as "Omarchy (before unl0kr)" (boot order unchanged). If
-  the new prompt fails, press F12 at the Dell logo, pick that entry, then run
-  `system/unl0kr/setup.sh --undo`.
-- Loses Omarchy's boot splash; unl0kr draws its own dark screen.
 
 ### Screen rotation
 - The display panel in the bar comes from the
