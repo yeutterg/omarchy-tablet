@@ -3,6 +3,15 @@
 Every intentional deviation from what Omarchy ships, for tablets and
 detachables in general. Git history has the exact diffs.
 
+### Inherit the generic touchscreen layer — 2026-10-23
+
+- **File:** `install.sh`
+- **Change:** Install the sibling `omarchy-touchscreen` layer before the
+  tablet-specific configuration, cloning it when absent. Uninstalling the
+  tablet layer deliberately keeps the shared base and Hyprland extras loader.
+- **Why:** Display mapping and native app touch apply to touchscreen desktops
+  too; on-screen keyboards, rotation UI and mobile gestures do not.
+
 ### Move and resize windows by touch — 2026-10-14
 - **Files:** `home/.config/hypr/extras/55-touch-windows.lua`, `install.sh`
   (`install_hyprgrass`), `packages.txt` (`meson`, `glm`)

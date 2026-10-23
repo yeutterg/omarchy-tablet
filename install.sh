@@ -18,6 +18,14 @@ if [[ ! $chassis =~ ^3[012]$ && $force != --force ]]; then
   exit 1
 fi
 
+install_touchscreen_layer() {
+  local touchscreen_repo=${OMARCHY_TOUCHSCREEN_DIR:-$(dirname "$repo")/omarchy-touchscreen}
+  if [[ ! -x $touchscreen_repo/install.sh ]]; then
+    git clone https://github.com/yeutterg/omarchy-touchscreen "$touchscreen_repo"
+  fi
+  "$touchscreen_repo/install.sh"
+}
+
 link_tree() {
   local rel target
   while IFS= read -r -d '' rel; do
@@ -164,6 +172,7 @@ default_battery_power_saver() {
   omarchy-powerprofiles-set autodetect 2>/dev/null || true
 }
 
+install_touchscreen_layer
 link_tree
 install_plugin_deps
 install_hyprgrass

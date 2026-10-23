@@ -56,23 +56,6 @@ restore_backups() {
   done < <(find "$HOME/.config" -type f -name '*.pre-dotfiles' -print0 2>/dev/null)
 }
 
-remove_extras_loader() {
-  local config=$HOME/.config/hypr/hyprland.lua
-  local comment='-- Drop-in files from repos like omarchy-tablet, loaded in name order.'
-  local loader='for file in io.popen("find -L ~/.config/hypr/extras -maxdepth 1 -type f -name '\''*.lua'\'' 2>/dev/null | sort"):lines() do dofile(file) end'
-
-  [[ -f $config ]] || return 0
-  grep -qF "$loader" "$config" || return 0
-
-  awk -v comment="$comment" -v loader="$loader" '
-    $0 == comment { next }
-    $0 == loader { next }
-    { print }
-  ' "$config" >"$config.tmp"
-  mv "$config.tmp" "$config"
-  echo "Removed the hypr/extras loader from $config"
-}
-
 restore_battery_default() {
   local state=${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/powerprofiles/battery
   if [[ -f $state && $(<"$state") == power-saver ]]; then
@@ -86,7 +69,6 @@ disable_services
 remove_plugins
 remove_repo_links
 restore_backups
-remove_extras_loader
 restore_battery_default
 
 systemctl --user daemon-reload >/dev/null 2>&1 || true

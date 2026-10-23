@@ -3,6 +3,11 @@
 [Omarchy](https://omarchy.org) customizations for tablets and detachables
 (Surface-style devices). Nothing here is tied to one model.
 
+This is the mobile-usability layer. Its installer first installs the narrower
+[omarchy-touchscreen](https://github.com/yeutterg/omarchy-touchscreen) base for
+display mapping and native application touch, then adds tablet-mode UI and
+detached-use behavior.
+
 **Complementary repo:** hardware-specific fixes load on top of this one. For the
 Dell Latitude 7350 Detachable, see
 [omarchy-dell-latitude-7350-detachable](https://github.com/yeutterg/omarchy-dell-latitude-7350-detachable).
@@ -11,6 +16,7 @@ Dell Latitude 7350 Detachable, see
 
 | Customization | Summary |
 |---|---|
+| Touchscreen base | Maps touch and pen to the built-in panel and gives Spotify native Wayland touch through `omarchy-touchscreen` |
 | [On-screen keyboard](#on-screen-keyboard) | The on-screen keyboard plugin, set up as the input method: pops up on text fields while detached, docks or floats |
 | [Stay Awake with the cover closed](#stay-awake-with-the-cover-closed) | Omarchy's Stay Awake also covers the lid and power button, turns on by itself while herdr agents work, audio keeps playing with the cover closed, and a low-battery safety valve |
 | [Lock screen PIN pad](#lock-screen-pin-pad) | A number pad on the lock screen for an optional 4–6 digit PIN |
@@ -107,7 +113,8 @@ Full details, reasons and things to watch on Omarchy updates are in
 ## Install
 
 Requires Omarchy on a tablet, convertible or detachable (DMI chassis type
-30–32), plus the packages in [packages.txt](packages.txt).
+30–32), plus the packages in [packages.txt](packages.txt). The installer clones
+the sibling `omarchy-touchscreen` dependency if it is not already present.
 
 ```bash
 sudo pacman -S --needed python-pywayland jq libpulse iio-sensor-proxy
@@ -124,6 +131,10 @@ user units, and adds one line to
 `~/.config/hypr/hyprland.lua` that loads `~/.config/hypr/extras/*.lua` in name
 order. This repo's Hyprland settings are `extras/50-tablet.lua`; device repos
 use `60-*.lua`.
+
+Removing this tablet layer leaves `omarchy-touchscreen` installed because a
+desktop or hardware layer may still depend on it. Run that repo's
+`uninstall.sh` separately when the base touch behavior is no longer wanted.
 
 To remove the tablet layer, restore replaced files, disable its services, and
 bring Omarchy's built-in plugins back:
