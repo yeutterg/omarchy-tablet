@@ -123,6 +123,11 @@ rotation, lock screen PIN pad, tray for touch) with `omarchy plugin add`, enable
 user units, and adds one line to
 `~/.config/hypr/hyprland.lua` that loads `~/.config/hypr/extras/*.lua` in name
 order. This repo's Hyprland settings are `extras/50-tablet.lua`; device repos
-use `60-*.lua`. To uninstall, delete the symlinks into this repo and restore any
-`*.pre-dotfiles` files, and `omarchy plugin remove` each plugin (Omarchy's
-built-ins come back).
+use `60-*.lua`.
+
+To remove the tablet layer, restore replaced files, disable its services, and
+bring Omarchy's built-in plugins back:
+
+```bash
+~/dotfiles/omarchy-tablet/uninstall.sh
+```
